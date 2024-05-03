@@ -1,0 +1,160 @@
+================================================================================
+ DESCRIÇÃO DO FORMATO DE ARQUIVO ED2
+================================================================================
+
+--------------------------------------------------------------------------------
+ ===== HISTÓRICO DO DOCUMENTO =====
+
+ === 30/04/2024 ===
+ - Gramática atualizada.
+ Regras antigas:
+ <scope>        ::= <identifier> <blank_line>* "(" <blank_line>+ <data>* <blank> ")"
+ <key>          ::= <identifier> "=" <value>
+
+ Regras atualizadas:
+ <scope>        ::= <identifier> (<blank> | <blank_line>)* "(" <blank_line>+ <data>* <blank> ")"
+ <key>          ::= <identifier> <blank> "=" <blank> <value>
+
+ === 22/04/2024 ===
+ - Primeira versão do documento.
+
+--------------------------------------------------------------------------------
+
+ O formato de arquivo ED2 foi criado para ser usado na atividade Apl2 da
+ disciplina Estrutura de Dados II do curso de Ciência da Computação da
+ Universidade Presbiteriana Mackenzie.
+
+ Um arquivo ED2 é um arquivo texto com extensão .ed2 cujo conteúdo segue a
+ gramática descrita neste documento. O significado do conteúdo de um arquivo
+ ED2 é definido pelo contexto onde o arquivo é usado.
+
+ Alguns exemplos de possíveis usos do arquivo ED2 incluem:
+    - Configuração de parâmetros de softwares (aplicativos web, banco de dados,
+      jogos, entre outros);
+    - Software com suporte a múltiplas línguas (um arquivo ED2 para cada língua
+      suportada pelo software);
+    - Agenda de eventos;
+    - Registro de clientes;
+    - Organização de receitas culinárias;
+    - Catálogo de uma biblioteca de livros.
+
+ O arquivo ED2 possibilita:
+    - Atribuir valores a chaves.
+    - Criar seções/grupos ("escopos") que podem conter chaves e grupos (escopos
+      aninhados).
+    - Incluir comentários.
+
+================================================================================
+ GRAMÁTICA
+================================================================================
+ <data>         ::= ((<scope> | <key> | <comment>)* <blank_line>)*
+ <scope>        ::= <identifier> (<blank> | <blank_line>)* "(" <blank_line>+ <data>* <blank> ")"
+ <key>          ::= <identifier> <blank> "=" <blank> <value>
+ <identifier>   ::= <string>
+ <value>        ::= <string>
+ <comment>      ::= "#" <string>
+
+ <string>       ::= <char>+
+ <char>         ::= <basic_latin> | <latin_1_supp> | <whitespace>
+ <basic_latin>  ::= [\u0020-\u007F]  ; Unicode Basic Latin
+ <latin_1_supp> ::= [\u00A0-\u00FF]  ; Unicode Latin-1 Supplement
+
+ <blank_line>   ::= <blank> <newline>
+ <blank>        ::= <whitespace>*
+ <whitespace>   ::= " " | "\t"
+ <newline>      ::= "\n" | "\r" | "\r\n"
+
+ Nesta gramática, considere que:
+
+    - O símbolo | indica OU.
+      Por exemplo: <whitespace> ::= " " | "\t" descreve que <whitespace> é
+      definido por um espaço em branco (" ") ou por uma tabulação ("\t").
+
+    - O símbolo * indica ZERO OU MAIS elementos que vem antes do símbolo.
+      Por exemplo: <blank> ::= <whitespace>* descreve que <blank> é definido por
+      zero ou mais <whitespace>.
+
+    - O símbolo + indica UM OU MAIS elementos que vem antes do símbolo.
+      Por exemplo: <string> ::= <char>+ descreve que <string> é definido por um
+      ou mais <char>.
+
+    - Os símbolos ( e ) agrupam elementos.
+      Por exemplo: <data> ::= ((<scope> | <key> | <comments>)* <blank_line>)*
+      descreve que <data> é definido por ZERO OU MAIS <scope> OU <key> OU
+      <comments> seguido de <blank_line> e que essa sequência pode aparecer
+      ZERO OU MAIS vezes.
+
+    - Símbolos não-terminais são escritos entre < e >. Alguns exemplos de
+      símbolos não-terminais que aparecem na gramática: <identifier>, <key>,
+      <char>, <blank_line>.
+      Símbolos não-terminais podem ser substituídos por símbolos terminais
+      ou por outros símbolos não-terminais. Por exemplo, <string> pode ser
+      substituído por <char>+, que por sua vez pode ser substituído por um
+      <whitespace> (dentre outras possiblidades), sendo que <whitespace>
+      pode ser substituído ou por um terminal " " ou por um terminal "\t".
+
+    - Símbolos terminais são escritos entre aspas duplas. Alguns exemplos de
+      símbolos terminais que aparecem na gramática: "#", "\n", "(", ")".
+      (observe que <scope> possui os terminais "(" e ")", que são diferentes
+      dos símbolos ( e ) de agrupamento).
+      Símbolos terminais representam um elemento indivisível da linguagem e
+      não podem ser substituídos por outros símbolos. Por exemplo, o terminal
+      "#" representa o símbolo # e nunca poderá ser alterado na linguagem.
+
+    - Intervalos de caracteres estão representados entre os símbolos [, - e ].
+      Por exemplo: <basic_latin> ::= [\u0020-\u007F] descreve que <basic_latin>
+      pode ser substituído por qualquer valor do intervalo 0020 a 007F da
+      codificação de caracteres Unicode.
+
+================================================================================
+ EXEMPLO
+================================================================================
+# - Um comentário é uma linha que começa com o símbolo '#' e termina com uma
+# quebra de linha ("ENTER").
+# - Só são permitidos comentários de linha única.
+
+# - Todas as chaves e escopos (grupos) possuem um identificador (nome) e devem
+# ser criados em uma nova linha e terminados com uma quebra de linha.
+# - Um identificador é uma string.
+# - Toda chave aparece à esquerda do operador de atribuição '=' e sempre deve
+# receber um valor (que está à direita do operador de atribuição).
+# - Um valor é uma string.
+
+# - Uma string possui 1+ caracteres <char>.
+# - Um <char> é qualquer caractere Unicode Basic Latin e Latin-1 Supplement
+# (ver: https://en.wikipedia.org/wiki/List_of_Unicode_characters#Basic_Latin e
+# https://en.wikipedia.org/wiki/List_of_Unicode_characters#Latin-1_Supplement).
+# - É possível incluir linhas em branco no arquivo.
+
+Exemplo de chave = Algum valor aqui.
+
+# - O escopo padrão é o escopo "global" (implícito). Por exemplo, a chave
+# "Exemplo de chave" criada acima está no escopo padrão (e o valor atribuído
+# à chave é "Algum valor aqui.").
+# - Todo escopo, com exceção do global, começa com o símbolo '(' após o seu
+# nome e agrupa um conjunto de chaves e outros escopos/grupos.
+# - O símbolo '(' pode estar localizado logo após o nome do escopo (na mesma
+# linha) ou na linha seguinte.
+# - Todo escopo termina com o símbolo ')', sendo que o ')' deve estar em uma
+# nova linha, obrigatoriamente, e terminar com uma quebra de linha.
+# - Não é permitido criar uma chave ou escopo na mesma linha do símbolo '(',
+# isto é, toda chave/escopo que pertence à um escopo deve ser criado em uma
+# nova linha.
+
+escopo (
+  chave=valorX
+  escopo
+  (
+    chave = valorY
+  )
+  mais chaves = e valores
+)
+
+# Cria a chave "Exemplo aleatório" com valor "valorABC".
+Exemplo aleatório = valorABC
+
+# Redefine o valor da chave "Exemplo aleatório", que passa a armazenar "valorXYZ".
+Exemplo aleatório = valorXYZ
+
+# Um arquivo ED2 vazio é um arquivo válido.
+
