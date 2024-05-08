@@ -68,7 +68,18 @@ public class BinaryTree {
 	
 	public int getHeight() { return this.root.getHeight(); } // devolve a altura da raiz (altura da arvore)
 	
-	public void inOrder() { inOrder(root); }
+	private void treeInformation() {
+		System.out.println("\n"+this.getClass());
+		System.out.println("Tree Degree: " + this.getDegree());
+		System.out.println("Tree Height: " + this.getHeight());
+		System.out.println(count()+" nodes");
+	}
+	
+	public void inOrder() {
+		treeInformation();
+		System.out.println("InOrder traversal:");
+		inOrder(root); 
+		}
 	
 	private void inOrder(Node root) {// esquerda, raiz e direita
 		if(root != null) {
@@ -78,7 +89,11 @@ public class BinaryTree {
 		}
 	}
 	
-	public void preOrder() { preOrder(root); }
+	public void preOrder() { 
+		treeInformation();
+		System.out.println("PreOrder traversal:");
+		preOrder(root);
+		}
 	
 	private void preOrder(Node root) {// raiz, esquerda e direita
 		if(root != null) {
@@ -89,7 +104,11 @@ public class BinaryTree {
 
 	}
 	
-	public void postOrder() { postOrder(root); }
+	public void postOrder() {
+		treeInformation();
+		System.out.println("PostOrder traversal:");
+		postOrder(root); 
+		}
 	
 	private void postOrder(Node root) {//esquerda, direita e raiz
 		if(root != null) {
@@ -119,6 +138,23 @@ public class BinaryTree {
 					fila.add(current.getRight());
 				}
 			}
+		}
+	}
+	
+	public int count() {
+		return count(this.root);
+	}
+	
+	private int count(Node root) {
+		if(root == null) {
+			return 0;
+		}else {
+			
+			int leftNodes = count(root.getLeft());
+			int rightNodes = count(root.getRight());
+			
+			return 1 + leftNodes + rightNodes;
+			
 		}
 	}
 
