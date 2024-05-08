@@ -32,17 +32,6 @@ public class BST extends BinaryTree {
 	
 	public BST(Node root) { super(root); }
 	
-	@Override
-	public void inOrder() {this.display(root);} //ordem crescente
-	
-	private void display(Node root) {
-		if(root != null) {
-			display(root.getLeft());
-			System.out.println(root);
-			display(root.getRight());
-		}
-	}
-	
 	public Node search(int key) {
 		return search(this.root,key);
 	}

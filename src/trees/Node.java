@@ -157,10 +157,11 @@ public class Node {
 	@Override
 	public String toString() {
 		return "node: " + data
-				+ ", parent: " + (parent != null ? parent.getData() : "null")
-				+ ", left: " + (left != null ? left.getData() : "null")
-				+ ", right: " + (right != null ? right.getData() : "null")
-				+ ", Balance Factor: " + balanceFactor;
+				+ ", isRoot?: " + (this.isRoot())
+				+ ", isLeaf?: " + (this.isLeaf())
+				+ ", Degree: " + (this.getDegree())
+				+ ", Level: " + (this.getLevel())
+				+ ", Height: " + (this.getHeight());
 	}
 	
 }

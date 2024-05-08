@@ -36,9 +36,21 @@ public class Main {
 		Scanner input = new Scanner(System.in);
 		String option;
 		boolean carregado = false;
+		AvlTree avl = new AvlTree();
+		BST bst = new BST();
+		
+		bst.insert(10);
+		bst.insert(9);
+		bst.insert(11);
+		bst.insert(1);
+		
+		avl.insert(55);
+		avl.insert(22);
+		avl.insert(71);
 		
 		while(true) {
-			System.out.println("1. Carregar dados de um arquivo ED2\r\n"
+			System.out.println("\nMapeamento Arquivos Árvores Bst-Avl\r\n"
+					+ "1. Carregar dados de um arquivo ED2\r\n"
 					+ "2. Buscar uma chave/escopo na árvore\r\n"
 					+ "3. Inserir uma chave/escopo na árvore\r\n"
 					+ "4. Alterar uma chave da árvore\r\n"
@@ -91,14 +103,20 @@ public class Main {
 					break;
 				case "7":
 					if(carregado) {
-						
+						bst.treeInformation();
+						bst.preOrder();
+						bst.inOrder();
+						bst.postOrder();
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
 					break;
 				case "8":
 					if(carregado) {
-						
+						avl.treeInformation();
+						avl.preOrder();
+						avl.inOrder();
+						avl.postOrder();
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
