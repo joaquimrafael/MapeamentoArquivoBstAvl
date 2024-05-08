@@ -84,9 +84,9 @@ public class Parser {
 
 		// Descomente o código abaixo para ver a lista de tokens gerada pelo Tokenizer.
 //		System.out.println("==================== TOKENS ====================");
-//		for (var token : tokens) {
-//			System.out.println(token);
-//		}
+		for (var token : tokens) {
+			System.out.println(token);
+		}
 //		System.out.println("==================== TOKENS ====================");
 		
 		parse();
