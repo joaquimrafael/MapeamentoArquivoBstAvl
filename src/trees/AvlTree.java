@@ -36,7 +36,7 @@ public class AvlTree extends BST{
 	}
 	
 	@Override
-	public void insert(int data) {
+	public void insert(String data) {
 	    super.insert(data);
 	    
 	    Node aux = search(data);
@@ -71,7 +71,7 @@ public class AvlTree extends BST{
 	}
 	
 	@Override
-	public void remove(int data) {
+	public void remove(String data) {
 		Node aux = search(data);
 		aux = aux.getParent();
 		
