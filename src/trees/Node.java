@@ -28,21 +28,21 @@ package trees;
 
 public class Node {
 	
-	private int data;
+	private String data;
 	private Node parent;
 	private Node left;
 	private Node right;
 	private int balanceFactor;
 	
 	public Node() {
-		this.data = 0;
+		this.data = null;
 		this.parent = null;
 		this.left = null;
 		this.right = null;
 		this.balanceFactor = 0;
 	}
 	
-	public Node(int data) {
+	public Node(String data) {
 		this.data = data;
 		this.parent = null;
 		this.left = null;
@@ -50,7 +50,7 @@ public class Node {
 		this.balanceFactor = 0;
 	}
 	
-	public Node(int data, Node parent) {
+	public Node(String data, Node parent) {
 		this.data = data;
 		this.parent = parent;
 		this.left = null;
@@ -59,7 +59,7 @@ public class Node {
 	
 	}
 	
-	public Node(int data, Node left, Node right, Node parent) {
+	public Node(String data, Node left, Node right, Node parent) {
 		this.data = data;
 		this.parent = parent;
 		this.left = left;
@@ -67,9 +67,9 @@ public class Node {
 		this.balanceFactor = 0;
 	}
 
-	public int getData() { return data; }
+	public String getData() { return data; }
 
-	public void setData(int data) { this.data = data; }
+	public void setData(String data) { this.data = data; }
 
 	public Node getParent() { return parent; }
 

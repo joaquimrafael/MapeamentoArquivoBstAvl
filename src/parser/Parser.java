@@ -188,6 +188,8 @@ public class Parser {
 		System.out.print(sum);
 	}
 	
+	
+	
 	private int getIntFromToken() {
 		try {
 			return Integer.parseInt(currToken.getValue());

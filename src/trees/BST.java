@@ -26,44 +26,48 @@
 
 package trees;
 
+
 public class BST extends BinaryTree {
 	
 	public BST() { super(); }
 	
 	public BST(Node root) { super(root); }
 	
-	public Node search(int key) {
+	public Node search(String key) {
 		return search(this.root,key);
 	}
 	
-	private Node search(Node root, int key) {
+	private Node search(Node root, String data) {
 		if(root == null) { 
 			return null; 
 		}else {
-			if(key == root.getData()) { 
+			int result = data.compareTo(root.getData());
+			if(result == 0) { 
 				return root; 
-			}else if (key < root.getData()) {
-				return search(root.getLeft(),key);
+			}else if (result < 0) {
+				return search(root.getLeft(),data);
 			}else {
-				return search(root.getRight(),key);
+				return search(root.getRight(),data);
 			}
 		}
 	}
 	
-	public void insert(int data) {
-		this.root = insert(root, data);
+	
+	public void insert(String data) {
+		this.root = insert(root, null, data);
 	}
 	
-	private Node insert(Node root, int data) {
+	private Node insert(Node root, Node parent, String data) {
 		
 		if(root == null) { 
-			root = new Node(data,null);
+			root = new Node(data,parent);
 			return root;
 		}else {
-			if (data < root.getData()) {
-				 root.setLeft(insert(root.getLeft(),data));
-			}else if (data > root.getData()) {
-				root.setRight(insert(root.getRight(),data));
+			int result = data.compareTo(root.getData());
+			if (result < 0) {
+				 root.setLeft(insert(root.getLeft(),root,data));
+			}else if (result > 0) {
+				root.setRight(insert(root.getRight(),root,data));
 			}else {
 				throw new RuntimeException("Já existe um nó com essa chave");
 			}
@@ -72,32 +76,34 @@ public class BST extends BinaryTree {
 		
 	}
 	
-	public void remove(int data) {
+	public void remove(String data) {
 		if(search(data) == null) {
 			throw new RuntimeException("Não existe um nó com essa chave");
 		}else {
-			this.root = remove(root.getParent(),root, data);
+		this.root = remove(root.getParent(),root, data);
 		}
 	}
 	
-	private Node remove(Node parent, Node current, int data) {
+	private Node remove(Node parent, Node current, String data) {
 	    if (current == null) {
 	        return null;
 	    } else {
-	        if (data < current.getData()) {
+	        int result = data.compareTo(current.getData());
+	        if (result < 0) {
 	            current.setLeft(remove(current, current.getLeft(), data));
-	        } else if (data > current.getData()) {
+	        } else if (result > 0) {
 	            current.setRight(remove(current, current.getRight(), data));
 	        } else {
-	        	//caso de nenhum filho
+
 	            if (current.isLeaf()) {
 	            	current.setParent(null);
 	                current = null;
-	                //caso de um filho
+	                
 	            } else if (current.getLeft() == null) {
 	            	Node removed = current;
 	                current = removed.getRight();
 	                current.setParent(removed.getParent());
+	                removed.setData(null);
 	                removed.setParent(null);
 	                removed.setLeft(null);
 	                removed.setRight(null);
@@ -105,6 +111,7 @@ public class BST extends BinaryTree {
 	            	Node removed = current;
 	                current = current.getLeft();
 	                current.setParent(removed.getParent());
+	                removed.setData(null);
 	                removed.setParent(null);
 	                removed.setLeft(null);
 	                removed.setRight(null);
@@ -122,7 +129,7 @@ public class BST extends BinaryTree {
 	}
 	
 	
-	public Node findPredecessor(int data) {
+	public Node findPredecessor(String data) {
 		Node node = search(data);
 		if(node == null) {
 			return null;
@@ -150,7 +157,7 @@ public class BST extends BinaryTree {
 		}
 	}
 	
-	public Node findSucessor(int data) {
+	public Node findSucessor(String data) {
 		Node node = search(data);
 		if(node == null) {
 			return null;

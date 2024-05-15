@@ -39,27 +39,27 @@ public class Main {
 		AvlTree avl = new AvlTree();
 		BST bst = new BST();
 		
-		bst.insert(10);
-		bst.insert(9);
-		bst.insert(11);
-		bst.insert(1);
+		bst.insert("10");
+		bst.insert("9");
+		bst.insert("11");
+		bst.insert("1");
 		
-		avl.insert(55);
-		avl.insert(22);
-		avl.insert(71);
+		avl.insert("55");
+		avl.insert("22");
+		avl.insert("71");
 		
 		while(true) {
-			System.out.println("\nMapeamento Arquivos Árvores Bst-Avl\r\n"
+			System.out.println("\nMapeamento Arquivos Arvores Bst-Avl\r\n"
 					+ "1. Carregar dados de um arquivo ED2\r\n"
-					+ "2. Buscar uma chave/escopo na árvore\r\n"
-					+ "3. Inserir uma chave/escopo na árvore\r\n"
-					+ "4. Alterar uma chave da árvore\r\n"
-					+ "5. Remover uma chave da árvore\r\n"
+					+ "2. Buscar uma chave/escopo na arvore\r\n"
+					+ "3. Inserir uma chave/escopo na arvore\r\n"
+					+ "4. Alterar uma chave da arvore\r\n"
+					+ "5. Remover uma chave da arvore\r\n"
 					+ "6. Salvar dados para um arquivo\r\n"
-					+ "7. Exibir o conteúdo e as propriedades da árvore BST\r\n"
-					+ "8. Exibir o conteúdo e as propriedades da árvore AVL\r\n"
+					+ "7. Exibir o conteudo e as propriedades da arvore BST\r\n"
+					+ "8. Exibir o conteudo e as propriedades da arvore AVL\r\n"
 					+ "9. Encerrar o programa");
-			System.out.println("Digite sua opção");
+			System.out.println("Digite sua escolha");
 			option = input.nextLine();
 			
 			switch (option) {
