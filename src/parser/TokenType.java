@@ -45,17 +45,10 @@ package parser;
 
 // Possíveis tokens reconhecidos pela classe Tokenizer.
 public enum TokenType {
-	
-	PRINT,
-	SUM,
-	IDENTIFIER,
-	VALUE,
 	COMMENT,
 	KEY,
 	SCOPE,
-	DATA,
 	STRING,
-	UINT,
 	WHITESPACE,
 	NEWLINE,
 	EOF

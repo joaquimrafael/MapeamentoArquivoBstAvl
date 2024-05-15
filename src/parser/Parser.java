@@ -98,22 +98,22 @@ public class Parser {
 	// todo o conteúdo foi processado corretamente.
 	private void parse() {
 		advance();
-		code();		
+		data();		
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
 		}
 	}
 	
 	// <code> ::= ((<print> | <sum>)* <blank_line>)*
-	private void code() {
+	private void data() {
 		TokenType type = currToken.getType();
 
 		// Consome 0+ regras do tipo <print> e/ou <sum> seguida por <blank_line>.
-		while (type == TokenType.PRINT || type == TokenType.SUM || type == TokenType.NEWLINE) {
-			if (type == TokenType.PRINT) {
-				print();
-			} else if (type == TokenType.SUM) {
-				sum();
+		while (type == TokenType.STRING || type == TokenType.COMMENT || type == TokenType.NEWLINE) {
+			if (type == TokenType.STRING) {
+				verfifyScopeKey();
+			} else if (type == TokenType.COMMENT) {
+				comment();
 			}
 			
 			// Após processar <print> ou <sum>, consome um <blank_line>.
@@ -126,10 +126,72 @@ public class Parser {
 		}
 	}
 	
-	// <print> ::= ">" <whitespace>* <string>
-	private void print() {
-		// Consome ">".
-		consume(TokenType.PRINT);
+	//Quando achamos uma String pura, teremos a possibilidade dela ser um scope ou uma key
+	private void verfifyScopeKey() {
+		boolean keyWhiteSpace = false;
+		consume(TokenType.STRING);
+		while (currToken.getType() == TokenType.WHITESPACE) {
+			consume(TokenType.WHITESPACE);
+			keyWhiteSpace = true;
+		}
+		if(currToken.getType() == TokenType.KEY && keyWhiteSpace) {
+			key();
+		}else {
+			scope();
+		}
+	}
+	 // <scope> ::= <identifier> (<blank> | <blank_lines>)* "(" <blank_line>+ <data>* <blank> ")"
+	private void scope() {
+		//Consumir quebra de linhas e espaços em branco, caso exista
+		while (currToken.getType() == TokenType.NEWLINE || currToken.getType() == TokenType.WHITESPACE) {
+			if(currToken.getType() == TokenType.NEWLINE) {
+				consume(TokenType.NEWLINE);
+			}else {
+				consume(TokenType.WHITESPACE);
+			}
+		}
+		//Consumindo abertura "("
+		consume(TokenType.SCOPE);
+		
+		//Consumindo uma ou mais newLines <blank_line>
+		consume(TokenType.NEWLINE);
+		while(currToken.getType() == TokenType.NEWLINE) {
+			consume(TokenType.NEWLINE);
+		}
+		
+		//Verificando agora a <data> ARRUMAR PARA FUNCIONAR RECURSIVO
+		if (currToken.getType() == TokenType.COMMENT) {
+			comment();
+		}
+		if (currToken.getType() == TokenType.STRING) {
+			verfifyScopeKey();
+		}
+		
+		while (currToken.getType() == TokenType.WHITESPACE) {
+			consume(TokenType.WHITESPACE);
+		}
+		//Consumindo fechamento (está certo?)
+		consume(TokenType.SCOPE);
+	}
+	
+	
+	// <key> ::= <string> <blank> "=" <blank> <string>
+	private void key() {
+		//Consumindo o identificador '='
+		consume(TokenType.KEY);
+		
+		//Consumindo os espaços em branco após o identificador '='
+		while (currToken.getType() == TokenType.WHITESPACE) {
+			consume(TokenType.WHITESPACE);
+		}
+		
+		consume(TokenType.STRING);
+	}
+	
+	// <comment> ::= "#" <string>
+	private void comment() {
+		// Consome "#".
+		consume(TokenType.COMMENT);
 		
 		// Consome 0+ espaços em branco (<whitespace>*).
 		while (currToken.getType() == TokenType.WHITESPACE) {
@@ -137,66 +199,11 @@ public class Parser {
 		}
 		
 		// Neste ponto, o esperado é ter um token STRING.
-		// Salvamos o valor do token para exibir em tela (caso o conteúdo esteja bem formado). 
-		String str = currToken.getValue();
 		
 		// Consome <string>.
 		consume(TokenType.STRING);
-		
-		// Se chegamos aqui, significa que o conteúdo seguiu a gramática e podemos processar a regra <print>
-		// (que significa exibir a string em tela).
-		System.out.print(str);
 	}
 	
-	// <sum> ::= "+" <whitespace>* <uint> (<whitespace>+ <uint>)*
-	private void sum() {
-		// Consome "+".
-		consume(TokenType.SUM);
-		
-		// Consome 0+ espaços em branco (<whitespace>*).
-		while (currToken.getType() == TokenType.WHITESPACE) {
-			consume(TokenType.WHITESPACE);
-		}
-		
-		// Neste ponto, o esperado é ter um token UINT.
-		// Salvamos o valor do token para realizar a somatória (caso o conteúdo esteja bem formado).
-		int sum = getIntFromToken();		
-		
-		// Consome <uint>.
-		consume(TokenType.UINT);
-
-		// Opcionalmente, podemos ter 0+ números separados por um espaço em branco ((<whitespace> <uint>)*),
-		// até chegar ao final da linha atual.
-		while (currToken.getType() != TokenType.NEWLINE) {
-			// Consome o <whitespace> obrigatório (<whitespace>+).
-			consume(TokenType.WHITESPACE);
-
-			// Consome espaços em branco extras, se tiver.
-			while (currToken.getType() == TokenType.WHITESPACE) {
-				consume(TokenType.WHITESPACE);
-			}
-
-			// Realizamos a somatória dos números.
-			sum += getIntFromToken();
-			
-			// Consome <uint>.
-			consume(TokenType.UINT);
-		}
-		
-		// Se chegamos aqui, significa que o conteúdo seguiu a gramática, temos a somatória dos números e podemos
-		// processar a regra <sum> (neste exemplo, exibimos o resultado da somatória em tela).
-		System.out.print(sum);
-	}
-	
-	
-	
-	private int getIntFromToken() {
-		try {
-			return Integer.parseInt(currToken.getValue());
-		} catch (Exception e) {
-			throw new RuntimeException("Parser.getIntFromToken(): Não foi possível converter o valor do token ('" + currToken.getValue() + "') em um número inteiro.");
-		}
-	}
 
 	// Avança para o próximo token da lista (atualiza currToken).
 	private void advance() {

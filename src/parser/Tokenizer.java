@@ -163,7 +163,7 @@ public class Tokenizer {
 				
 				} else if (currChar == '(' || currChar == ')') { // Reconhece um token SCOPE.
 					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
-					// comece com o caractere '(' ')').
+					// comece com o caractere '(' ')'.
 					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
 						isString = true;
 						startStringWith(sb, currChar);
