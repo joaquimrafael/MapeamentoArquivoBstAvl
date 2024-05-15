@@ -141,47 +141,38 @@ public class Tokenizer {
 					if (pos <= line.length() && !Character.isWhitespace(line.charAt(pos - 1))) {
 						--pos;
 					}
-				
-				} else if (Character.isDigit(currChar)) { // Reconhece um token UINT.
-					sb.setLength(0);
-					while (Character.isDigit(currChar)) {
-						sb.append(currChar);
-						currChar = getNextChar();
-					}
-					// Armazena o valor do UINT como string (será convertido para número pelo parser).
-					tokens.add(new Token(TokenType.UINT, sb.toString()));
-					sb.setLength(0);
-
-					// Se passamos por uma sequência de dígitos que compõem um número e não atingimos o
-					// final da linha, voltamos uma posição do cursor, para que a instrução
-					// currChar = getNextChar(); na próxima iteração do loop obtenha o caractere correto.
-					// Isso deve ser feito porque no loop de sequência de dígitos acima, sempre avançamos
-					// para o próximo caractere.
-					if (pos < line.length()) {
-						--pos;
-					}
-
-				} else if (currChar == '>') { // Reconhece um token PRINT.
-					// Se o token anterior é um PRINT, então começa uma string (permite que uma string
-					// comece com o caractere '>').
-					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.PRINT) {
+				if (currChar == '#') { // Reconhece um token COMMENT.
+					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
+					// comece com o caractere '#').
+					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
 						isString = true;
 						startStringWith(sb, currChar);
 					} else {
-						tokens.add(new Token(TokenType.PRINT, ">"));
+						tokens.add(new Token(TokenType.COMMENT, "#"));
 					}
 					
-				} else if (currChar == '+') { // Reconhece um token SUM.
-					// Se o token anterior é um PRINT, então começa uma string (permite que uma string
-					// comece com o caractere '+').
-					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.PRINT) {
+				} else if (currChar == '=') { // Reconhece um token KEY.
+					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
+					// comece com o caractere '=').
+					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
 						isString = true;
 						startStringWith(sb, currChar);
 					} else {
-						tokens.add(new Token(TokenType.SUM, "+"));
+						tokens.add(new Token(TokenType.KEY, "="));
 					}
 				
-				} else if (currChar != '\0') { // Provavelmente encontramos uma string.
+				} else if (currChar == '(' || currChar == ')') { // Reconhece um token SCOPE.
+					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
+					// comece com o caractere '(' ')').
+					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
+						isString = true;
+						startStringWith(sb, currChar);
+					} else {
+						tokens.add(new Token(TokenType.SCOPE, Character.toString(currChar)));
+					}
+				}
+
+				else if (currChar != '\0') { // Provavelmente encontramos uma string.
 					// Adiciona o caractere atual como primeiro da string e ativa flag isString para que,
 					// a partir da próxima iteração, os próximos caracteres sejam adicionados à string.
 					isString = true;
@@ -199,6 +190,7 @@ public class Tokenizer {
 				sb.setLength(0);
 				isString = false;
 			}
+		  }
 		}
 	
 		return tokens;
