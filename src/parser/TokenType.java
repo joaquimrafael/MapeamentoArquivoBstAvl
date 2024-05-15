@@ -48,6 +48,12 @@ public enum TokenType {
 	
 	PRINT,
 	SUM,
+	IDENTIFIER,
+	VALUE,
+	COMMENT,
+	KEY,
+	SCOPE,
+	DATA,
 	STRING,
 	UINT,
 	WHITESPACE,
