@@ -5,7 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Scanner;
+import java.io.File;
 
 
 public class Archive {
@@ -50,12 +51,33 @@ public class Archive {
 	}
 	
 	public void saveArchive(List<String> archive) throws IOException {
+		Scanner input = new Scanner(System.in);
+		String name;
+		System.out.println("Digite o nome do arquivo .ED2:");
+		name = input.nextLine();
+		name = name + ".ED2";
+		File file = new File(name);
+		
+		if(name.contains(" ")) {
+			input.close();
+			throw new IOException("Arquivo não pode conter espaços no nome!");
+		}
+		
+		if(file.exists()) {
+			input.close();
+			throw new IOException("Arquivo já existente no diretório");
+		}
+		
 		if(this.opened==true) {
-			BufferedWriter buffWrite = new BufferedWriter(new FileWriter(this.archiveName));
+			BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name+".ED2"));
 			for(int i=0;i<archive.size();i++) {
 				buffWrite.append(archive.get(i) + "\n");
 			}
 			buffWrite.close();
+		}else {
+			input.close();
+			throw new IOException("Nenhum arquivo aberto até o momento!");
 		}
+		input.close();
 	}
 }
