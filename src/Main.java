@@ -24,10 +24,15 @@
  *  Árvores - fundamentos (André Kishimoto)
  */
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
 import trees.AvlTree;
 import trees.BST;
-import trees.Node;
+import parser.Token;
+import parser.Tokenizer;
 
 public class Main {
 
@@ -48,6 +53,27 @@ public class Main {
 		avl.insert("22");
 		avl.insert("71");
 		
+		Archive archive = new Archive("teste.ed2");
+		List<String> contents;
+		try {
+			contents = archive.readArchive();
+		} catch (IOException e) {
+			input.close();
+			throw new RuntimeException(e.getMessage());
+		}
+		
+		/*for(int i=0;i<contents.size();i++) {
+			System.out.println(contents.get(i));
+		}*/
+		
+		Tokenizer tokenizer = new Tokenizer();
+		List<Token> tokens;
+		tokens = tokenizer.tokenize(contents);
+		
+		for(int i=0;i<tokens.size();i++) {
+			System.out.println(tokens.get(i));
+		}
+		/*
 		while(true) {
 			System.out.println("\nMapeamento Arquivos Arvores Bst-Avl\r\n"
 					+ "1. Carregar dados de um arquivo ED2\r\n"
@@ -131,6 +157,7 @@ public class Main {
 			}
 				
 		}
+		*/
 
 	}
 

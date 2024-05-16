@@ -15,13 +15,13 @@ public class Archive {
 	private Boolean opened;
 	
 	public Archive(String archiveName) {
-		this.archiveName = archiveName;
+		this.archiveName = archiveName + ".txt";
 		this.opened = false;
 		this.archive = new ArrayList<String>();
 		try {
-			this.validate(this.archiveName);
+			this.validate();
 		}catch(RuntimeException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 	
@@ -29,22 +29,18 @@ public class Archive {
 		return(this.opened);
 	}
 	
-	private void validate(String archiveName){
-		if(!archiveName.contains(".ed2") || !archiveName.contains(".ED2")) {
+	private void validate(){
+		if(!this.archiveName.contains(".ed2") && !this.archiveName.contains(".ED2")) {
 			throw new RuntimeException("Formato inválido!");
-		};
+		}
 	}
 	
-	public List<String> readArchive(String archiveName) throws IOException{
-		BufferedReader buffRead = new BufferedReader(new FileReader(archiveName));
+	public List<String> readArchive() throws IOException{
+		BufferedReader buffRead = new BufferedReader(new FileReader(this.archiveName));
 		String line = "";
-		while (true) {
-			if (line != null) {
-				line = buffRead.readLine();
-				this.archive.add(line);
-			} else
-				break;
-		}
+	    while ((line = buffRead.readLine()) != null) {
+	        this.archive.add(line);
+	    }
 		buffRead.close();
 		this.opened = true;
 		return(this.archive);
