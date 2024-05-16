@@ -45,30 +45,36 @@
 package parser;
 
 import java.util.List;
+import java.util.Stack;
 
-//================================================================================
-// GRAMÁTICA
-// Observe que parte da gramática é processada/avaliada na classe Tokenizer e
-// parte é processada/avaliada na classe Parser (<code>, <print> e <sum>).
-//================================================================================
-// <code>         ::= ((<print> | <sum>)* <blank_line>)*
-// <print>        ::= ">" <whitespace>* <string>
-// <sum>          ::= "+" <whitespace>* <uint> (<whitespace>+ <uint>)*
-// <string>       ::= <char>+
-// <char>         ::= <basic_latin> | <latin_1_supp> | <whitespace>
-// <basic_latin>  ::= [\u0020-\u007F]  ; Unicode Basic Latin
-// <latin_1_supp> ::= [\u00A0-\u00FF]  ; Unicode Latin-1 Supplement
-// <uint>         ::= <digit>+
-// <digit>        ::= [0-9]
-// <blank_line>   ::= <whitespace>* <newline>
-// <whitespace>   ::= " " | "\t"
-// <newline>      ::= "\n" | "\r" | "\r\n"
+/*
+================================================================================
+GRAMÁTICA
+================================================================================
+<data>         ::= ((<scope> | <key> | <comment>)* <blank_line>)*
+<scope>        ::= <identifier> (<blank> | <blank_line>)* "(" <blank_line>+ <data>* <blank> ")"
+<key>          ::= <identifier> <blank> "=" <blank> <value>
+<identifier>   ::= <string>
+<value>        ::= <string>
+<comment>      ::= "#" <string>
+
+<string>       ::= <char>+
+<char>         ::= <basic_latin> | <latin_1_supp> | <whitespace>
+<basic_latin>  ::= [\u0020-\u007F]  ; Unicode Basic Latin
+<latin_1_supp> ::= [\u00A0-\u00FF]  ; Unicode Latin-1 Supplement
+
+<blank_line>   ::= <blank> <newline>
+<blank>        ::= <whitespace>*
+<whitespace>   ::= " " | "\t"
+<newline>      ::= "\n" | "\r" | "\r\n" 
+*/
 
 public class Parser {
 
 	private List<Token> tokens;
 	private Token currToken;
 	private int index;
+	Stack<String> stackParser = new Stack<String>();
 
 	public Parser() {
 		tokens = null;
@@ -102,6 +108,11 @@ public class Parser {
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
 		}
+		
+		//Verificando abertura e fechamento do scope
+		if(!stackParser.isEmpty()) {
+			throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
+		}
 	}
 	
 	// <code> ::= ((<print> | <sum>)* <blank_line>)*
@@ -128,16 +139,23 @@ public class Parser {
 	
 	//Quando achamos uma String pura, teremos a possibilidade dela ser um scope ou uma key
 	private void verfifyScopeKey() {
+		//Variável usada para identificar se pelo menos existe um espaço antes do identificador
+		// "="
 		boolean keyWhiteSpace = false;
 		consume(TokenType.STRING);
+		//Consumindo espaços antes do identificador
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
 			keyWhiteSpace = true;
 		}
+		//Verificando se é scope ou key
 		if(currToken.getType() == TokenType.KEY && keyWhiteSpace) {
 			key();
-		}else {
+		}else if(currToken.getType() == TokenType.SCOPE) {
 			scope();
+		}else {
+			//Quando dentro de um escopo encontramos uma string sem semântica
+			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou STRING");
 		}
 	}
 	 // <scope> ::= <identifier> (<blank> | <blank_lines>)* "(" <blank_line>+ <data>* <blank> ")"
@@ -150,6 +168,12 @@ public class Parser {
 				consume(TokenType.WHITESPACE);
 			}
 		}
+		
+		//Empilhando abertura para verificar correspondência
+		if(currToken.getValue() == "(") {
+			stackParser.push("(");
+		}
+		
 		//Consumindo abertura "("
 		consume(TokenType.SCOPE);
 		
@@ -174,7 +198,12 @@ public class Parser {
 				consume(TokenType.WHITESPACE);
 			}
 		}
+		//Não chega nessa verificação
 		
+		//Desempilhando abertura ao achar fechamento
+		if(currToken.getValue() == ")") {
+			stackParser.pop();
+		}
 		//Consumindo fechamento
 		consume(TokenType.SCOPE);
 	}

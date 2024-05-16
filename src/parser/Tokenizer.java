@@ -45,23 +45,27 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-//================================================================================
-// GRAMÁTICA
-// Observe que parte da gramática é processada/avaliada na classe Tokenizer e
-// parte é processada/avaliada na classe Parser (<code>, <print> e <sum>).
-//================================================================================
-// <code>         ::= ((<print> | <sum>)* <blank_line>)*
-// <print>        ::= ">" <whitespace>* <string>
-// <sum>          ::= "+" <whitespace>* <uint> (<whitespace>+ <uint>)*
-// <string>       ::= <char>+
-// <char>         ::= <basic_latin> | <latin_1_supp> | <whitespace>
-// <basic_latin>  ::= [\u0020-\u007F]  ; Unicode Basic Latin
-// <latin_1_supp> ::= [\u00A0-\u00FF]  ; Unicode Latin-1 Supplement
-// <uint>         ::= <digit>+
-// <digit>        ::= [0-9]
-// <blank_line>   ::= <whitespace>* <newline>
-// <whitespace>   ::= " " | "\t"
-// <newline>      ::= "\n" | "\r" | "\r\n"
+/*
+================================================================================
+GRAMÁTICA
+================================================================================
+<data>         ::= ((<scope> | <key> | <comment>)* <blank_line>)*
+<scope>        ::= <identifier> (<blank> | <blank_line>)* "(" <blank_line>+ <data>* <blank> ")"
+<key>          ::= <identifier> <blank> "=" <blank> <value>
+<identifier>   ::= <string>
+<value>        ::= <string>
+<comment>      ::= "#" <string>
+
+<string>       ::= <char>+
+<char>         ::= <basic_latin> | <latin_1_supp> | <whitespace>
+<basic_latin>  ::= [\u0020-\u007F]  ; Unicode Basic Latin
+<latin_1_supp> ::= [\u00A0-\u00FF]  ; Unicode Latin-1 Supplement
+
+<blank_line>   ::= <blank> <newline>
+<blank>        ::= <whitespace>*
+<whitespace>   ::= " " | "\t"
+<newline>      ::= "\n" | "\r" | "\r\n" 
+*/
 
 public class Tokenizer {
 	
@@ -80,6 +84,7 @@ public class Tokenizer {
 		int lineIndex = 0;
 		char currChar = '\0';
 		boolean isString = false;
+		String reservedChars = "=#() ";
 		
 		while (true) {
 			// Pode avançar para a próxima linha?
@@ -125,7 +130,6 @@ public class Tokenizer {
 			
 			if (!isString) {
 				currChar = getNextChar();
-				
 				if (Character.isWhitespace(currChar)) { // Reconhece um token WHITESPACE.
 					// Considera uma sequência de espaços em branco como um único espaço em branco.
 					while (Character.isWhitespace(currChar)) {
@@ -141,7 +145,7 @@ public class Tokenizer {
 					if (pos <= line.length() && !Character.isWhitespace(line.charAt(pos - 1))) {
 						--pos;
 					}
-				if (currChar == '#') { // Reconhece um token COMMENT.
+				}else if (currChar == '#') { // Reconhece um token COMMENT.
 					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
 					// comece com o caractere '#').
 					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
@@ -180,17 +184,20 @@ public class Tokenizer {
 				}
 
 			} else { // Reconhece um token STRING.
-				// Neste exemplo, a única condição para indicar que chegamos ao final de uma string é
-				// ler todo o conteúdo da linha atual até o final da linha.
-				while (pos < line.length()) {
+				// Aqui verificamos se chegamos ao final da string ou achamos um char reservado ou um whitespace para parar de considerar
+				// string
+				while (pos < line.length() && !reservedChars.contains(Character.toString(currChar))) {
 					currChar = getNextChar();
 					sb.append(currChar);
 				}
 				tokens.add(new Token(TokenType.STRING, sb.toString()));
+				//Adicionando novamente o WHITESPACE
+				if(Character.isWhitespace(currChar)) {
+					tokens.add(new Token(TokenType.WHITESPACE, " "));
+				}
 				sb.setLength(0);
 				isString = false;
 			}
-		  }
 		}
 	
 		return tokens;
