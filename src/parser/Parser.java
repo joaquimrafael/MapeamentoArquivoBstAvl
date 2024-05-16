@@ -116,7 +116,7 @@ public class Parser {
 				comment();
 			}
 			
-			// Após processar <print> ou <sum>, consome um <blank_line>.
+			// Após processar <comment> ou <scope> ou <key>, consome um <blank_line>.
 			consume(TokenType.NEWLINE);
 			
 			// Neste exemplo, processamos a regra <blank_line> com uma quebra de linha na saída em tela.
@@ -159,18 +159,23 @@ public class Parser {
 			consume(TokenType.NEWLINE);
 		}
 		
-		//Verificando agora a <data> ARRUMAR PARA FUNCIONAR RECURSIVO
-		if (currToken.getType() == TokenType.COMMENT) {
-			comment();
-		}
-		if (currToken.getType() == TokenType.STRING) {
-			verfifyScopeKey();
+		//Verificando agora a <data>
+		while(currToken.getValue() != ")" || currToken.getType() != TokenType.EOF) {
+			if (currToken.getType() == TokenType.COMMENT) {
+				comment();
+			}
+			if (currToken.getType() == TokenType.STRING) {
+				verfifyScopeKey();
+			}
+			if(currToken.getType() == TokenType.NEWLINE) {
+				consume(TokenType.NEWLINE);
+			}
+			if(currToken.getType() == TokenType.WHITESPACE) {
+				consume(TokenType.WHITESPACE);
+			}
 		}
 		
-		while (currToken.getType() == TokenType.WHITESPACE) {
-			consume(TokenType.WHITESPACE);
-		}
-		//Consumindo fechamento (está certo?)
+		//Consumindo fechamento
 		consume(TokenType.SCOPE);
 	}
 	
