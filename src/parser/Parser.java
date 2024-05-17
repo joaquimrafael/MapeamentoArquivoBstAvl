@@ -181,7 +181,7 @@ public class Parser {
 		}
 		
 		//Verificando agora a <data>
-		while(currToken.getValue() != ")" && currToken.getType() != TokenType.EOF) {
+		while(currToken.getValue() != ")" || currToken.getType() != TokenType.EOF) {
 			if (currToken.getType() == TokenType.COMMENT) {
 				comment();
 			} else if (currToken.getType() == TokenType.STRING) {
@@ -241,7 +241,7 @@ public class Parser {
 	private void advance() {
 		++index;
 		if (index >= tokens.size()) {
-			throw new RuntimeException("Fim de conteúdo inesperado.");
+			throw new RuntimeException("Fim de conteúdo inesperado");
 		}
 		currToken = tokens.get(index);
 	}
