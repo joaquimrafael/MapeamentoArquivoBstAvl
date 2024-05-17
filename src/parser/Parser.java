@@ -44,6 +44,7 @@
 
 package parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -74,7 +75,8 @@ public class Parser {
 	private List<Token> tokens;
 	private Token currToken;
 	private int index;
-	Stack<String> stackParser = new Stack<String>();
+	private Stack<String> stackParser = new Stack<String>();
+	public List<Scope> scopes = new ArrayList<Scope>();
 
 	public Parser() {
 		tokens = null;
@@ -87,13 +89,6 @@ public class Parser {
 		tokens = tokenizer.tokenize(contents);
 		currToken = null;
 		index = -1;
-
-		// Descomente o código abaixo para ver a lista de tokens gerada pelo Tokenizer.
-//		System.out.println("==================== TOKENS ====================");
-		for (var token : tokens) {
-			System.out.println(token);
-		}
-//		System.out.println("==================== TOKENS ====================");
 		
 		parse();
 	}
@@ -104,6 +99,8 @@ public class Parser {
 	// todo o conteúdo foi processado corretamente.
 	private void parse() {
 		advance();
+		//Setando escopo global
+		scopes.add(new Scope("global", 0));
 		data();		
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
@@ -143,6 +140,7 @@ public class Parser {
 		boolean keyWhiteSpace = false;
 		boolean blankScope = false;
 		consume(TokenType.STRING);
+		
 		//Consumindo espaços antes do identificador
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
