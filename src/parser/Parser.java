@@ -99,8 +99,8 @@ public class Parser {
 	}
 	
 	// O parser sempre começa avançando para o primeiro token da lista e, na sequência,
-	// avalia a regra <code> (a regra mais geral da gramática).
-	// Após processar <code>, o último token da lista deve ser o EOF, indicando que
+	// avalia a regra <data> (a regra mais geral da gramática).
+	// Após processar <data>, o último token da lista deve ser o EOF, indicando que
 	// todo o conteúdo foi processado corretamente.
 	private void parse() {
 		advance();
@@ -108,18 +108,17 @@ public class Parser {
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
 		}
-		
-		//Verificando abertura e fechamento do scope
+		//Verificando stack ao final da execução do parser
 		if(!stackParser.isEmpty()) {
 			throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
 		}
 	}
 	
-	// <code> ::= ((<print> | <sum>)* <blank_line>)*
+	// <data> ::= ((<scope> | <key> | <comment>)* <blank_line>)*
 	private void data() {
 		TokenType type = currToken.getType();
 
-		// Consome 0+ regras do tipo <print> e/ou <sum> seguida por <blank_line>.
+		// Consome 0+ regras do tipo <commnet> e/ou <key> e/ou <scope> seguida por <blank_line>.
 		while (type == TokenType.STRING || type == TokenType.COMMENT || type == TokenType.NEWLINE) {
 			if (type == TokenType.STRING) {
 				verfifyScopeKey();
@@ -142,17 +141,29 @@ public class Parser {
 		//Variável usada para identificar se pelo menos existe um espaço antes do identificador
 		// "="
 		boolean keyWhiteSpace = false;
+		boolean blankScope = false;
 		consume(TokenType.STRING);
 		//Consumindo espaços antes do identificador
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
 			keyWhiteSpace = true;
 		}
+		//Consumindo quebra de linhas para escopo
+		while(currToken.getType() == TokenType.NEWLINE) {
+			consume(TokenType.NEWLINE);
+			blankScope = true;
+			//Consumindo espaços em branco antes do possível escopo
+			while(currToken.getType()== TokenType.WHITESPACE) {
+				consume(TokenType.WHITESPACE);
+			}
+		}
 		//Verificando se é scope ou key
-		if(currToken.getType() == TokenType.KEY && keyWhiteSpace) {
+		if(currToken.getType() == TokenType.KEY && keyWhiteSpace && !blankScope) {
 			key();
 		}else if(currToken.getType() == TokenType.SCOPE) {
 			scope();
+		}else if(currToken.getType()== TokenType.COMMENT  && !blankScope) {
+			comment();
 		}else {
 			//Quando dentro de um escopo encontramos uma string sem semântica
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou STRING");
@@ -169,13 +180,15 @@ public class Parser {
 			}
 		}
 		
+		//Consumindo abertura "("
+		Token previousToken = currToken;
+		consume(TokenType.SCOPE);
 		//Empilhando abertura para verificar correspondência
-		if(currToken.getValue() == "(") {
-			stackParser.push("(");
+		if(previousToken.getValue().equals("(")) {
+			stackParser.push(previousToken.getValue());
 		}
 		
-		//Consumindo abertura "("
-		consume(TokenType.SCOPE);
+		
 		
 		//Consumindo uma ou mais newLines <blank_line>
 		consume(TokenType.NEWLINE);
@@ -187,25 +200,26 @@ public class Parser {
 		while(currToken.getValue() != ")" || currToken.getType() != TokenType.EOF) {
 			if (currToken.getType() == TokenType.COMMENT) {
 				comment();
-			}
-			if (currToken.getType() == TokenType.STRING) {
+			} else if (currToken.getType() == TokenType.STRING) {
 				verfifyScopeKey();
-			}
-			if(currToken.getType() == TokenType.NEWLINE) {
+			} else if(currToken.getType() == TokenType.NEWLINE) {
 				consume(TokenType.NEWLINE);
-			}
-			if(currToken.getType() == TokenType.WHITESPACE) {
+			} else if(currToken.getType() == TokenType.WHITESPACE) {
 				consume(TokenType.WHITESPACE);
+			}else {
+				break;
 			}
-		}
-		//Não chega nessa verificação
-		
-		//Desempilhando abertura ao achar fechamento
-		if(currToken.getValue() == ")") {
-			stackParser.pop();
 		}
 		//Consumindo fechamento
+		previousToken = currToken;
 		consume(TokenType.SCOPE);
+		//Desempilhando abertura ao achar fechamento
+		if(previousToken.getValue().equals(")")) {
+			if(stackParser.isEmpty()) {
+				throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
+			}
+			stackParser.pop();
+		}
 	}
 	
 	
@@ -215,6 +229,7 @@ public class Parser {
 		consume(TokenType.KEY);
 		
 		//Consumindo os espaços em branco após o identificador '='
+		consume(TokenType.WHITESPACE);
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
 		}
@@ -228,14 +243,13 @@ public class Parser {
 		consume(TokenType.COMMENT);
 		
 		// Consome 0+ espaços em branco (<whitespace>*).
-		while (currToken.getType() == TokenType.WHITESPACE) {
-			consume(TokenType.WHITESPACE);
+		while(currToken.getType()==TokenType.STRING || currToken.getType()==TokenType.WHITESPACE) {
+			if(currToken.getType()==TokenType.STRING) {
+				consume(TokenType.STRING);
+			}else {
+				consume(TokenType.WHITESPACE);
+			}
 		}
-		
-		// Neste ponto, o esperado é ter um token STRING.
-		
-		// Consome <string>.
-		consume(TokenType.STRING);
 	}
 	
 
@@ -243,7 +257,7 @@ public class Parser {
 	private void advance() {
 		++index;
 		if (index >= tokens.size()) {
-			throw new RuntimeException("Fim de conteúdo inesperado.");
+			throw new RuntimeException("Fim de conteúdo inesperado");
 		}
 		currToken = tokens.get(index);
 	}

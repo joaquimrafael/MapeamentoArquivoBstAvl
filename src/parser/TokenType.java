@@ -52,5 +52,4 @@ public enum TokenType {
 	WHITESPACE,
 	NEWLINE,
 	EOF
-
 }
