@@ -108,11 +108,6 @@ public class Parser {
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
 		}
-		
-		//Verificando abertura e fechamento do scope
-		if(!stackParser.isEmpty()) {
-			throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
-		}
 	}
 	
 	// <code> ::= ((<print> | <sum>)* <blank_line>)*
@@ -169,13 +164,15 @@ public class Parser {
 			}
 		}
 		
+		//Consumindo abertura "("
+		Token previousToken = currToken;
+		consume(TokenType.SCOPE);
 		//Empilhando abertura para verificar correspondência
-		if(currToken.getValue() == "(") {
-			stackParser.push("(");
+		if(previousToken.getValue().equals("(")) {
+			stackParser.push(previousToken.getValue());
 		}
 		
-		//Consumindo abertura "("
-		consume(TokenType.SCOPE);
+		
 		
 		//Consumindo uma ou mais newLines <blank_line>
 		consume(TokenType.NEWLINE);
@@ -184,28 +181,29 @@ public class Parser {
 		}
 		
 		//Verificando agora a <data>
-		while(currToken.getValue() != ")" || currToken.getType() != TokenType.EOF) {
+		while(currToken.getValue() != ")" && currToken.getType() != TokenType.EOF) {
 			if (currToken.getType() == TokenType.COMMENT) {
 				comment();
-			}
-			if (currToken.getType() == TokenType.STRING) {
+			} else if (currToken.getType() == TokenType.STRING) {
 				verfifyScopeKey();
-			}
-			if(currToken.getType() == TokenType.NEWLINE) {
+			} else if(currToken.getType() == TokenType.NEWLINE) {
 				consume(TokenType.NEWLINE);
-			}
-			if(currToken.getType() == TokenType.WHITESPACE) {
+			} else if(currToken.getType() == TokenType.WHITESPACE) {
 				consume(TokenType.WHITESPACE);
+			}else {
+				break;
 			}
-		}
-		//Não chega nessa verificação
-		
-		//Desempilhando abertura ao achar fechamento
-		if(currToken.getValue() == ")") {
-			stackParser.pop();
 		}
 		//Consumindo fechamento
+		previousToken = currToken;
 		consume(TokenType.SCOPE);
+		//Desempilhando abertura ao achar fechamento
+		if(previousToken.getValue().equals(")")) {
+			if(stackParser.isEmpty()) {
+				throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
+			}
+			stackParser.pop();
+		}
 	}
 	
 	
