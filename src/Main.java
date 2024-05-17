@@ -45,14 +45,17 @@ public class Main {
 		AvlTree avl = new AvlTree();
 		BST bst = new BST();
 		
-		bst.insert("10");
-		bst.insert("9");
-		bst.insert("11");
-		bst.insert("1");
+		bst.insert("a",2);
+		bst.insert("a",3);
+		bst.insert("a",4);
+		bst.insert("a",1);
 		
-		avl.insert("55");
-		avl.insert("22");
-		avl.insert("71");
+		//bst.inOrder();
+		
+		avl.insert("a",2);
+		avl.insert("a",3);
+		avl.insert("a",4);
+		avl.insert("a",1);
 		
 		Archive archive = new Archive("teste.ed2");
 		List<String> contents;
