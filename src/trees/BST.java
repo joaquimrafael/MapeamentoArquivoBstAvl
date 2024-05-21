@@ -1,5 +1,7 @@
 package trees;
 
+import java.util.ArrayList;
+
 public class BST extends BinaryTree {
 
     public BST() { super(); }
@@ -24,6 +26,24 @@ public class BST extends BinaryTree {
                 return search(root.getRight(), data, scopeId);
             }
         }
+    }
+    
+    public ArrayList<Node> searchList(String data){
+    	ArrayList<Node> scopes = new ArrayList<Node>();
+    	
+    	searchList(this.root, data, scopes);
+    	
+    	return scopes;
+    }
+    
+    private void searchList(Node root, String data, ArrayList<Node> list){
+    	if(root != null) {
+    		if(root.getData().equals(data)) {
+    			list.add(root);
+    		}
+    		searchList(root.getLeft(), data, list);
+    		searchList(root.getRight(), data, list);
+    	}
     }
 
     public void insert(String data, int scopeId) {

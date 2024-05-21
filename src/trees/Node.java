@@ -70,6 +70,8 @@ public class Node implements Comparable<Node> {
     public void setParent(Node parent) { this.parent = parent; }
 
     public Node getLeft() { return left; }
+    
+    
 
     public void setLeft(Node left) { 
         this.left = left; 
