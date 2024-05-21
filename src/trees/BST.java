@@ -33,6 +33,10 @@ public class BST extends BinaryTree {
     	
     	searchList(this.root, data, scopes);
     	
+    	if(scopes.isEmpty()) {
+    		throw new RuntimeException("Chave não existe no arquivo!");
+    	}
+    	
     	return scopes;
     }
     
