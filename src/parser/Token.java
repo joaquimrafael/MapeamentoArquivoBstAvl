@@ -52,6 +52,10 @@ public class Token {
 		this.value = value;
 	}
 	
+	public void setValue(String newValue) {
+		this.value = newValue;
+	}
+	
 	public TokenType getType() {
 		return type;
 	}

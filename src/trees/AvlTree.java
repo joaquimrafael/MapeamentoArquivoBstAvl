@@ -10,9 +10,9 @@ public class AvlTree extends BST {
     }
 
     @Override
-    public void insert(String data, int scopeId) {
-        super.insert(data, scopeId);
-        Node aux = search(data, scopeId);
+    public void insert(String data, int scopeId, String type) {
+        super.insert(data, scopeId, type);
+        Node aux = search(data, scopeId, type);
 
         while (aux != null) { // verifica o balanceamento de cada nó ancestral do adicionado
             if (aux.getBalanceFactor() >= -1 && aux.getBalanceFactor() <= 1) {
@@ -43,11 +43,11 @@ public class AvlTree extends BST {
     }
 
     @Override
-    public void remove(String data, int scopeId) {
-        Node aux = search(data, scopeId);
+    public void remove(String data, int scopeId, String type) {
+        Node aux = search(data, scopeId, type);
         aux = aux.getParent();
 
-        super.remove(data, scopeId);
+        super.remove(data, scopeId, type);
 
         if (aux == null) {
             aux = root; // caso tenha removido a raiz, testa o balanceamento da nova raiz

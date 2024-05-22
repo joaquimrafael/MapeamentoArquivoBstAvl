@@ -8,22 +8,22 @@ public class BST extends BinaryTree {
 
     public BST(Node root) { super(root); }
 
-    public Node search(String data, int scopeId) {
-        return search(this.root, data, scopeId);
+    public Node search(String data, int scopeId, String type) {
+        return search(this.root, data, scopeId, type);
     }
 
-    private Node search(Node root, String data, int scopeId) {
+    private Node search(Node root, String data, int scopeId, String type) {
         if (root == null) { 
             return null; 
         } else {
-            Node searchNode = new Node(data, scopeId);
+            Node searchNode = new Node(data, scopeId, type);
             int result = root.compareTo(searchNode);
             if (result == 0) { 
                 return root; 
             } else if (result > 0) {
-                return search(root.getLeft(), data, scopeId);
+                return search(root.getLeft(), data, scopeId, type);
             } else {
-                return search(root.getRight(), data, scopeId);
+                return search(root.getRight(), data, scopeId, type);
             }
         }
     }
@@ -50,21 +50,21 @@ public class BST extends BinaryTree {
     	}
     }
 
-    public void insert(String data, int scopeId) {
-        this.root = insert(root, null, data, scopeId);
+    public void insert(String data, int scopeId, String type) {
+        this.root = insert(root, null, data, scopeId, type);
     }
 
-    private Node insert(Node root, Node parent, String data, int scopeId) {
+    private Node insert(Node root, Node parent, String data, int scopeId, String type) {
         if (root == null) { 
-            root = new Node(data, scopeId, parent);
+            root = new Node(data, scopeId, parent, type);
             return root;
         } else {
-            Node newNode = new Node(data, scopeId);
+            Node newNode = new Node(data, scopeId, type);
             int result = root.compareTo(newNode);
             if (result > 0) {
-                root.setLeft(insert(root.getLeft(), root, data, scopeId));
+                root.setLeft(insert(root.getLeft(), root, data, scopeId, type));
             } else if (result < 0) {
-                root.setRight(insert(root.getRight(), root, data, scopeId));
+                root.setRight(insert(root.getRight(), root, data, scopeId, type));
             } else {
                 throw new RuntimeException("Já existe um nó com essa chave");
             }
@@ -72,24 +72,24 @@ public class BST extends BinaryTree {
         return root;
     }
 
-    public void remove(String data, int scopeId) {
-        if (search(data, scopeId) == null) {
+    public void remove(String data, int scopeId, String type) {
+        if (search(data, scopeId, type) == null) {
             throw new RuntimeException("Não existe um nó com essa chave");
         } else {
-            this.root = remove(root.getParent(), root, data, scopeId);
+            this.root = remove(root.getParent(), root, data, scopeId, type);
         }
     }
 
-    private Node remove(Node parent, Node current, String data, int scopeId) {
+    private Node remove(Node parent, Node current, String data, int scopeId, String type) {
         if (current == null) {
             return null;
         } else {
-            Node removeNode = new Node(data, scopeId);
+            Node removeNode = new Node(data, scopeId, type);
             int result = current.compareTo(removeNode);
             if (result > 0) {
-                current.setLeft(remove(current, current.getLeft(), data, scopeId));
+                current.setLeft(remove(current, current.getLeft(), data, scopeId, type));
             } else if (result < 0) {
-                current.setRight(remove(current, current.getRight(), data, scopeId));
+                current.setRight(remove(current, current.getRight(), data, scopeId, type));
             } else {
                 if (current.isLeaf()) {
                     current.setParent(null);
@@ -111,18 +111,18 @@ public class BST extends BinaryTree {
                     removed.setLeft(null);
                     removed.setRight(null);
                 } else {
-                    Node predecessor = findPredecessor(data, scopeId);
+                    Node predecessor = findPredecessor(data, scopeId, type);
                     current.setData(predecessor.getData());
                     current.setScopeId(predecessor.getScopeId());
-                    current.setLeft(remove(current, current.getLeft(), predecessor.getData(), predecessor.getScopeId()));
+                    current.setLeft(remove(current, current.getLeft(), predecessor.getData(), predecessor.getScopeId(), type));
                 }
             }
         }
         return current;
     }
 
-    public Node findPredecessor(String data, int scopeId) {
-        Node node = search(data, scopeId);
+    public Node findPredecessor(String data, int scopeId, String type) {
+        Node node = search(data, scopeId, type);
         if (node == null) {
             return null;
         } else { return findPredecessor(node); }
@@ -146,8 +146,8 @@ public class BST extends BinaryTree {
         }
     }
 
-    public Node findSuccessor(String data, int scopeId) {
-        Node node = search(data, scopeId);
+    public Node findSuccessor(String data, int scopeId, String type) {
+        Node node = search(data, scopeId, type);
         if (node == null) {
             return null;
         } else { return findSuccessor(node); }

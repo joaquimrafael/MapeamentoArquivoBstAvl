@@ -5,6 +5,7 @@ public class Node implements Comparable<Node> {
     private String data;
     private String value;
     private int scopeId;
+    private String type;
     private Node parent;
     private Node left;
     private Node right;
@@ -28,13 +29,14 @@ public class Node implements Comparable<Node> {
         this.scopeId = 0;
     }
 
-    public Node(String data, int scopeId) {
+    public Node(String data, int scopeId, String type) {
         this.data = data;
         this.scopeId = scopeId;
         this.parent = null;
         this.left = null;
         this.right = null;
         this.balanceFactor = 0;
+        this.type = type;
     }
 
     public Node(String data, Node parent) {
@@ -42,8 +44,8 @@ public class Node implements Comparable<Node> {
         this.parent = parent;
     }
 
-    public Node(String data, int scopeId, Node parent) {
-        this(data, scopeId);
+    public Node(String data, int scopeId, Node parent, String type) {
+        this(data, scopeId, type);
         this.parent = parent;
     }
 
@@ -54,6 +56,8 @@ public class Node implements Comparable<Node> {
     }
 
     public String getData() { return data; }
+    
+    public String getType() { return type; }
     
     public String getValue() { return value; }
     

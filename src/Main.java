@@ -43,35 +43,6 @@ public class Main {
 		Scanner input = new Scanner(System.in);
 		String option;
 		boolean carregado = false;
-		AvlTree avl = new AvlTree();
-		BST bst = new BST();
-		
-		bst.insert("g",2);
-		bst.insert("a",3);
-		bst.insert("b",4);
-		bst.insert("z",1);
-		bst.treeInformation();
-		bst.inOrder();
-		
-		
-		avl.insert("a",2);
-		avl.insert("a",3);
-		avl.insert("a",4);
-		avl.insert("a",1);
-		
-		ArrayList<Node> tests = avl.searchList("a");
-		
-		System.out.println("Lista de nos iguais: ");
-		for(Node i : tests) {
-			System.out.println(i.getData()+" "+ i.getScopeId());
-		}
-		
-		System.out.println(tests);
-		avl.treeInformation();
-		avl.inOrder();
-		avl.remove("a", 3);
-		avl.treeInformation();
-		avl.inOrder();
 		
 		Archive archive = new Archive("teste.ed2");
 		List<String> contents;
