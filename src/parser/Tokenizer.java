@@ -148,32 +148,17 @@ public class Tokenizer {
 				}else if (currChar == '#') { // Reconhece um token COMMENT.
 					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
 					// comece com o caractere '#').
-					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
-						isString = true;
-						startStringWith(sb, currChar);
-					} else {
-						tokens.add(new Token(TokenType.COMMENT, "#"));
-					}
+					tokens.add(new Token(TokenType.COMMENT, "#"));
 					
 				} else if (currChar == '=') { // Reconhece um token KEY.
 					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
 					// comece com o caractere '=').
-					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
-						isString = true;
-						startStringWith(sb, currChar);
-					} else {
-						tokens.add(new Token(TokenType.KEY, "="));
-					}
+					tokens.add(new Token(TokenType.KEY, "="));
 				
 				} else if (currChar == '(' || currChar == ')') { // Reconhece um token SCOPE.
 					// Se o token anterior é um COMMENT, então começa uma string (permite que uma string
 					// comece com o caractere '(' ')'.
-					if (tokens.size() > 0 && tokens.get(tokens.size() - 1).getType() == TokenType.COMMENT) {
-						isString = true;
-						startStringWith(sb, currChar);
-					} else {
-						tokens.add(new Token(TokenType.SCOPE, Character.toString(currChar)));
-					}
+					tokens.add(new Token(TokenType.SCOPE, Character.toString(currChar)));
 				}
 
 				else if (currChar != '\0') { // Provavelmente encontramos uma string.
@@ -186,10 +171,19 @@ public class Tokenizer {
 			} else { // Reconhece um token STRING.
 				// Aqui verificamos se chegamos ao final da string ou achamos um char reservado ou um whitespace para parar de considerar
 				// string
+				boolean special = false;
 				while (pos < line.length() && !reservedChars.contains(Character.toString(currChar))) {
 					currChar = getNextChar();
+					if(reservedChars.contains(Character.toString(currChar))) {
+						special = true;
+						break;
+					}
 					sb.append(currChar);
 				}
+				if(special) {
+					pos--;
+				}
+				//Voltando posição pulada dentro do while
 				tokens.add(new Token(TokenType.STRING, sb.toString()));
 				//Adicionando novamente o WHITESPACE
 				if(Character.isWhitespace(currChar)) {
@@ -211,6 +205,7 @@ public class Tokenizer {
 		}
 		return line.charAt(pos++);
 	}
+	
 	
 	private void startStringWith(StringBuilder sb, char ch) {
 		sb.setLength(0);

@@ -90,6 +90,9 @@ public class Parser {
 		currToken = null;
 		index = -1;
 		
+		for(int i=0;i<tokens.size();i++) {
+			System.out.println(tokens.get(i).getType());
+		}
 		parse();
 	}
 	
@@ -135,16 +138,20 @@ public class Parser {
 	
 	//Quando achamos uma String pura, teremos a possibilidade dela ser um scope ou uma key
 	private void verfifyScopeKey() {
-		//Variável usada para identificar se pelo menos existe um espaço antes do identificador
-		// "="
-		boolean keyWhiteSpace = false;
+		//Verificando se pulamos linha, caso sim sabemos que é scope
 		boolean blankScope = false;
+		int identifierIndex = index;
 		consume(TokenType.STRING);
+		
+		//adionar conteúdo ao identificador
+		if(currToken.getType()==TokenType.COMMENT) {
+			tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue()+"#");
+			consume(TokenType.COMMENT);
+		}
 		
 		//Consumindo espaços antes do identificador
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
-			keyWhiteSpace = true;
 		}
 		//Consumindo quebra de linhas para escopo
 		while(currToken.getType() == TokenType.NEWLINE) {
@@ -156,7 +163,7 @@ public class Parser {
 			}
 		}
 		//Verificando se é scope ou key
-		if(currToken.getType() == TokenType.KEY && keyWhiteSpace && !blankScope) {
+		if(currToken.getType() == TokenType.KEY && !blankScope) {
 			key();
 		}else if(currToken.getType() == TokenType.SCOPE) {
 			scope();
@@ -227,12 +234,16 @@ public class Parser {
 		consume(TokenType.KEY);
 		
 		//Consumindo os espaços em branco após o identificador '='
-		consume(TokenType.WHITESPACE);
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
 		}
-		
-		consume(TokenType.STRING);
+		int identifierIndex = index;
+		//Consumindo conteúdo de value
+		//ARRUMAR ??
+		while(currToken.getType()!=TokenType.EOF && currToken.getType()!=TokenType.NEWLINE) {
+			tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue()+currToken.getValue());
+			consume(currToken.getType());
+		}
 	}
 	
 	// <comment> ::= "#" <string>
@@ -240,13 +251,9 @@ public class Parser {
 		// Consome "#".
 		consume(TokenType.COMMENT);
 		
-		// Consome 0+ espaços em branco (<whitespace>*).
-		while(currToken.getType()==TokenType.STRING || currToken.getType()==TokenType.WHITESPACE) {
-			if(currToken.getType()==TokenType.STRING) {
-				consume(TokenType.STRING);
-			}else {
-				consume(TokenType.WHITESPACE);
-			}
+		// Consome todos os tipos de token possíveis
+		while(currToken.getType()!=TokenType.NEWLINE) {
+			consume(currToken.getType());
 		}
 	}
 	
