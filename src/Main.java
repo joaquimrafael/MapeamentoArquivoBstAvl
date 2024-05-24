@@ -26,8 +26,12 @@
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
 import trees.AvlTree;
 import trees.BST;
@@ -35,6 +39,7 @@ import trees.Node;
 import parser.Token;
 import parser.Tokenizer;
 import parser.Parser;
+import parser.Scope;
 
 public class Main {
 
@@ -43,6 +48,10 @@ public class Main {
 		Scanner input = new Scanner(System.in);
 		String option;
 		boolean carregado = false;
+		AvlTree avl = new AvlTree();
+		BST bst = new BST();
+		List<Scope> scopesMap;
+		Map<Node,Integer> nodesCount;
 		
 		Archive archive = new Archive("teste.ed2");
 		List<String> contents;
@@ -55,6 +64,16 @@ public class Main {
 		
 		Parser parser = new Parser();
 		parser.run(contents);
+		avl = parser.getAVL();
+		bst = parser.getBST();
+		scopesMap = parser.getScopesMap();
+		nodesCount = avl.searchList("a");
+		avl.inOrder();
+		for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
+            Node node = entry.getKey();
+            Integer comparisons = entry.getValue();
+            System.out.println("Node: " + node + ", Comparisons: " + comparisons);
+        }
 		/*
 		while(true) {
 			System.out.println("\nMapeamento Arquivos Arvores Bst-Avl\r\n"

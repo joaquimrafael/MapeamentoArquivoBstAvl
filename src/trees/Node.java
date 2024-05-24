@@ -1,11 +1,14 @@
 package trees;
 
+import java.util.Stack;
+
 public class Node implements Comparable<Node> {
     
     private String data;
     private String value;
     private int scopeId;
     private String type;
+    public Stack<Integer> path;
     private Node parent;
     private Node left;
     private Node right;
@@ -18,6 +21,7 @@ public class Node implements Comparable<Node> {
         this.right = null;
         this.balanceFactor = 0;
         this.scopeId = 0;
+        this.path = new Stack<Integer>();
     }
 
     public Node(String data) {
@@ -27,6 +31,7 @@ public class Node implements Comparable<Node> {
         this.right = null;
         this.balanceFactor = 0;
         this.scopeId = 0;
+        this.path = new Stack<Integer>();
     }
 
     public Node(String data, int scopeId, String type) {
@@ -37,6 +42,29 @@ public class Node implements Comparable<Node> {
         this.right = null;
         this.balanceFactor = 0;
         this.type = type;
+        this.path = new Stack<Integer>();
+    }
+    
+    public Node(String data, int scopeId, Node parent, String type, String value, Stack<Integer> path) {
+        this.data = data;
+        this.scopeId = scopeId;
+        this.parent = parent;
+        this.left = null;
+        this.right = null;
+        this.type = type;
+        this.value = value;
+        this.path = path;
+    }
+    
+    public Node(String data, int scopeId,  String type, String value, Stack<Integer> path) {
+        this.data = data;
+        this.scopeId = scopeId;
+        this.type = type;
+        this.parent = null;
+        this.left = null;
+        this.right = null;
+        this.value = value;
+        this.path = path;
     }
 
     public Node(String data, Node parent) {
@@ -160,7 +188,12 @@ public class Node implements Comparable<Node> {
         if (dataComparison != 0) {
             return dataComparison;
         } else {
-            return Integer.compare(this.scopeId, other.scopeId);
+            int scopeComparison = Integer.compare(this.scopeId, other.scopeId);
+            if (scopeComparison != 0) {
+                return scopeComparison;
+            } else {
+                return this.type.compareTo(other.type);
+            }
         }
     }
 
@@ -172,7 +205,9 @@ public class Node implements Comparable<Node> {
                 + ", isLeaf?: " + (this.isLeaf())
                 + ", Degree: " + (this.getDegree())
                 + ", Level: " + (this.getLevel())
-                + ", Height: " + (this.getHeight());
+                + ", Height: " + (this.getHeight())
+        		+ ", ScopeId: " + (this.getScopeId())
+        		+ ", Type: " + (this.getType());
     }
     
 }

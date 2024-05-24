@@ -1,6 +1,9 @@
 package trees;
 
+import java.util.Stack;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BST extends BinaryTree {
 
@@ -28,43 +31,43 @@ public class BST extends BinaryTree {
         }
     }
     
-    public ArrayList<Node> searchList(String data){
-    	ArrayList<Node> scopes = new ArrayList<Node>();
+    public Map<Node, Integer> searchList(String data){
+    	Map<Node, Integer> nodesCount = new HashMap<>();
     	
-    	searchList(this.root, data, scopes);
-    	
-    	if(scopes.isEmpty()) {
+    	searchList(this.root, data, nodesCount, 0);
+    	if(nodesCount.isEmpty()) {
     		throw new RuntimeException("Chave não existe no arquivo!");
     	}
     	
-    	return scopes;
+    	return nodesCount;
     }
     
-    private void searchList(Node root, String data, ArrayList<Node> list){
+    private void searchList(Node root, String data, Map<Node, Integer> nodesCount, int comparisons){
     	if(root != null) {
+    		comparisons++;
     		if(root.getData().equals(data)) {
-    			list.add(root);
+    			nodesCount.put(root, comparisons);
     		}
-    		searchList(root.getLeft(), data, list);
-    		searchList(root.getRight(), data, list);
+    		searchList(root.getLeft(), data, nodesCount, comparisons);
+    		searchList(root.getRight(), data, nodesCount, comparisons);
     	}
     }
 
-    public void insert(String data, int scopeId, String type) {
-        this.root = insert(root, null, data, scopeId, type);
+    public void insert(String data, int scopeId, String type, String value, Stack<Integer> path) {
+        this.root = insert(root, null, data, scopeId, type, value, path);
     }
 
-    private Node insert(Node root, Node parent, String data, int scopeId, String type) {
+    private Node insert(Node root, Node parent, String data, int scopeId, String type, String value, Stack<Integer> path) {
         if (root == null) { 
-            root = new Node(data, scopeId, parent, type);
+            root = new Node(data, scopeId, parent, type, value, path);
             return root;
         } else {
-            Node newNode = new Node(data, scopeId, type);
+            Node newNode = new Node(data, scopeId, type, value, path);
             int result = root.compareTo(newNode);
             if (result > 0) {
-                root.setLeft(insert(root.getLeft(), root, data, scopeId, type));
+                root.setLeft(insert(root.getLeft(), root, data, scopeId, type, value, path));
             } else if (result < 0) {
-                root.setRight(insert(root.getRight(), root, data, scopeId, type));
+                root.setRight(insert(root.getRight(), root, data, scopeId, type, value, path));
             } else {
                 throw new RuntimeException("Já existe um nó com essa chave");
             }

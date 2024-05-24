@@ -44,6 +44,7 @@
 
 package parser;
 
+import trees.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -76,7 +77,12 @@ public class Parser {
 	private Token currToken;
 	private int index;
 	private Stack<String> stackParser = new Stack<String>();
-	public List<Scope> scopes = new ArrayList<Scope>();
+	private List<Scope> scopes = new ArrayList<Scope>();
+	private Stack<Integer> path = new Stack<Integer>();
+	private int countScopeId = 0;
+	private AvlTree avl = new AvlTree();
+	private BST bst = new BST();
+	private String identifier;
 
 	public Parser() {
 		tokens = null;
@@ -91,7 +97,7 @@ public class Parser {
 		index = -1;
 		
 		for(int i=0;i<tokens.size();i++) {
-			System.out.println(tokens.get(i).getType());
+			//System.out.println(tokens.get(i).getValue());
 		}
 		parse();
 	}
@@ -104,6 +110,7 @@ public class Parser {
 		advance();
 		//Setando escopo global
 		scopes.add(new Scope("global", 0));
+		path.add(0);
 		data();		
 		if (currToken.getType() != TokenType.EOF) {
 			throw new RuntimeException("Parser.parse(): Esperado fim do conteúdo (EOF), mas encontrou " + currToken);
@@ -149,6 +156,8 @@ public class Parser {
 			consume(TokenType.COMMENT);
 		}
 		
+		identifier = tokens.get(identifierIndex).getValue();
+		
 		//Consumindo espaços antes do identificador
 		while (currToken.getType() == TokenType.WHITESPACE) {
 			consume(TokenType.WHITESPACE);
@@ -166,6 +175,12 @@ public class Parser {
 		if(currToken.getType() == TokenType.KEY && !blankScope) {
 			key();
 		}else if(currToken.getType() == TokenType.SCOPE) {
+			//Inserindo nó do scope encontrado
+			countScopeId++;
+			path.add(countScopeId);
+			scopes.add(new Scope(identifier, countScopeId));
+			avl.insert(identifier, path.peek(), "scope", "", path);
+			bst.insert(identifier, path.peek(), "scope", "", path);
 			scope();
 		}else if(currToken.getType()== TokenType.COMMENT  && !blankScope) {
 			comment();
@@ -220,6 +235,8 @@ public class Parser {
 		consume(TokenType.SCOPE);
 		//Desempilhando abertura ao achar fechamento
 		if(previousToken.getValue().equals(")")) {
+			//Voltando o caminho
+			path.pop();
 			if(stackParser.isEmpty()) {
 				throw new RuntimeException("Parser.parse(): Correspondência de abertura e fechamento de escopos com erro!");
 			}
@@ -233,17 +250,18 @@ public class Parser {
 		//Consumindo o identificador '='
 		consume(TokenType.KEY);
 		
-		//Consumindo os espaços em branco após o identificador '='
-		while (currToken.getType() == TokenType.WHITESPACE) {
-			consume(TokenType.WHITESPACE);
-		}
 		int identifierIndex = index;
+		consume(currToken.getType());
 		//Consumindo conteúdo de value
-		//ARRUMAR ??
 		while(currToken.getType()!=TokenType.EOF && currToken.getType()!=TokenType.NEWLINE) {
 			tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue()+currToken.getValue());
 			consume(currToken.getType());
 		}
+		
+		//Inserindo key na árvore
+		String value = tokens.get(identifierIndex).getValue();
+		avl.insert(identifier, path.peek(), "key", value, path);
+		bst.insert(identifier, path.peek(), "key", value, path);
 	}
 	
 	// <comment> ::= "#" <string>
@@ -278,5 +296,12 @@ public class Parser {
 			throw new RuntimeException("Parser.consume(): Token incorreto. Esperado: " + expected + ". Obtido: " + currToken);
 		}
 	}
-
+	
+	
+	//Getters das árvores construídas e do mapa de scopes
+	public BST getBST() { return(bst); }
+	
+	public AvlTree getAVL() { return(avl); }
+	
+	public List<Scope> getScopesMap() { return(scopes); }
 }

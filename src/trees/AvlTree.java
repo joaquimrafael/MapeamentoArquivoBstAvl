@@ -1,5 +1,7 @@
 package trees;
 
+import java.util.Stack;
+
 public class AvlTree extends BST {
     public AvlTree() {
         super();
@@ -10,8 +12,8 @@ public class AvlTree extends BST {
     }
 
     @Override
-    public void insert(String data, int scopeId, String type) {
-        super.insert(data, scopeId, type);
+    public void insert(String data, int scopeId, String type, String value, Stack<Integer> path) {
+        super.insert(data, scopeId, type, value, path);
         Node aux = search(data, scopeId, type);
 
         while (aux != null) { // verifica o balanceamento de cada nó ancestral do adicionado
