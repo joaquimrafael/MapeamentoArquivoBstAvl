@@ -41,7 +41,6 @@ public class Main {
 	public static void main(String[] args) {
 		
 		Scanner input = new Scanner(System.in);
-		Scanner inputInt = new Scanner(System.in);
 		String option;
 		boolean carregado = false;
 		AvlTree avl = new AvlTree();
@@ -109,8 +108,8 @@ public class Main {
 				case "3":
 					if(carregado) {
 						System.out.println("Digite 1 para adicionar um escopo e 2 para adiionar uma chave:");
-						int choice = input.nextInt();
-						if(choice==1) {
+						String choice = input.nextLine();
+						if(choice.equals("1")) {
 							System.out.println("Escopos disponíveis para inserção do escopo:");
 							
 							Map<Node,Integer> scopes = new HashMap<Node,Integer>();
@@ -120,17 +119,21 @@ public class Main {
 									scopes.putAll(avl.searchList(entry.getValue()));
 								}
 							}
-							System.out.println("global 0 | Parent Scope: null");
+							System.out.println("Nome: global | scopeId: 0 | Parent Scope: null");
 							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
 								if(entry.getKey().getType()=="scope") {
-									System.out.println(entry.getKey()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+									System.out.println("Nome: "+entry.getKey().getData()+" | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
 								}
 							}
 							System.out.println("Digite o nome do escopo a ser inserido:");
 							String newScopeName = input.nextLine();
 							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
-							int scopeId = inputInt.nextInt();
-							//mudar pra global
+							String scopeIdString = input.nextLine();
+							int scopeId = Integer.parseInt(scopeIdString);
+							if(!scopesMap.containsKey(scopeId)) {
+								System.out.println("O scopeId não existe atualmente, impossível inserir um novo escopo!");
+								continue;
+							}
 							Stack<Integer> newPath;
 							if(scopeId!=0) {
 								Node parent = avl.search(scopesMap.get(scopeId), scopeId, "scope");
@@ -145,10 +148,12 @@ public class Main {
 								newPath.add(parser.countScopeId);
 								avl.insert(newScopeName, scopeId, "scope", "", newPath);
 								bst.insert(newScopeName, scopeId, "scope", "", newPath);
+								avl.inOrder();
+								System.out.println("Inserção realizada com sucesso!");
 							}else {
 								System.out.println("Chave já existente!");
 							}
-						}else if(choice==2) {
+						}else if(choice.equals("2")) {
 							System.out.println("Escopos disponíveis para inserção da chave:");
 							
 							Map<Node,Integer> scopes =  new HashMap<Node,Integer>();
@@ -159,10 +164,10 @@ public class Main {
 								}
 							}
 							
-							System.out.println("global 0 | Parent Scope: null");
+							System.out.println("Nome: global | scopeId: 0 | Parent Scope: null");
 							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
 								if(entry.getKey().getType()=="scope") {
-									System.out.println(entry.getKey()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+									System.out.println("Nome: "+entry.getKey().getData()+" | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
 								}
 							}
 							
@@ -172,7 +177,12 @@ public class Main {
 							String value = input.nextLine();
 
 							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
-							int scopeId = inputInt.nextInt();
+							String scopeIdString = input.nextLine();
+							int scopeId = Integer.parseInt(scopeIdString);
+							if(!scopesMap.containsKey(scopeId)) {
+								System.out.println("O scopeId não existe atualmente, impossível inserir um nova chave!");
+								continue;
+							}
 							Stack<Integer> newPath;
 							if(scopeId!=0) {
 								Node parent = avl.search(scopesMap.get(scopeId), scopeId, "scope");
@@ -184,6 +194,7 @@ public class Main {
 							if(avl.search(newScopeName, scopeId, "scope")==null) {
 								avl.insert(newScopeName, scopeId, "key", value, newPath);
 								bst.insert(newScopeName, scopeId, "key", value, newPath);
+								System.out.println("Inserção realizada com sucesso!");
 							}else {
 								System.out.println("Chave já existente!");
 							}
