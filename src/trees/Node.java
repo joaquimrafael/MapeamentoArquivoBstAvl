@@ -181,6 +181,8 @@ public class Node implements Comparable<Node> {
         }
         
     }
+    
+    public Stack<Integer> getPath() { return(this.path); }
 
     @Override
     public int compareTo(Node other) {
@@ -200,14 +202,15 @@ public class Node implements Comparable<Node> {
     @Override
     public String toString() {
         return "node: " + data
-                + ", scopeId: " + scopeId
+                + ", value: " + this.value
+                + ", scopeId: " + this.scopeId
                 + ", isRoot?: " + (this.isRoot())
                 + ", isLeaf?: " + (this.isLeaf())
                 + ", Degree: " + (this.getDegree())
                 + ", Level: " + (this.getLevel())
                 + ", Height: " + (this.getHeight())
-        		+ ", ScopeId: " + (this.getScopeId())
-        		+ ", Type: " + (this.getType());
+                + ", ScopeId: " + (this.getScopeId())
+                + ", Type: " + (this.getType());
     }
     
 }

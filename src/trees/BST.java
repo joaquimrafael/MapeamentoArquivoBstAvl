@@ -1,7 +1,6 @@
 package trees;
 
 import java.util.Stack;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public class BST extends BinaryTree {
     	
     	searchList(this.root, data, nodesCount, 0);
     	if(nodesCount.isEmpty()) {
-    		throw new RuntimeException("Chave não existe no arquivo!");
+    		throw new RuntimeException("Chave/escopo não existe no arquivo!");
     	}
     	
     	return nodesCount;
@@ -69,7 +68,7 @@ public class BST extends BinaryTree {
             } else if (result < 0) {
                 root.setRight(insert(root.getRight(), root, data, scopeId, type, value, path));
             } else {
-                throw new RuntimeException("Já existe um nó com essa chave");
+                root.setValue(value);
             }
         }
         return root;

@@ -25,56 +25,31 @@
  */
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.HashMap;
-import java.util.Map;
 
 import trees.AvlTree;
 import trees.BST;
 import trees.Node;
-import parser.Token;
-import parser.Tokenizer;
 import parser.Parser;
-import parser.Scope;
 
 public class Main {
 
 	public static void main(String[] args) {
 		
 		Scanner input = new Scanner(System.in);
+		Scanner inputInt = new Scanner(System.in);
 		String option;
 		boolean carregado = false;
 		AvlTree avl = new AvlTree();
 		BST bst = new BST();
-		List<Scope> scopesMap;
-		Map<Node,Integer> nodesCount;
+		Map<Integer,String> scopesMap = null;
+		Map<Node,Integer> nodesCount = null;
+		Parser parser = null;
 		
-		Archive archive = new Archive("teste.ed2");
-		List<String> contents;
-		try {
-			contents = archive.readArchive();
-		} catch (IOException e) {
-			input.close();
-			throw new RuntimeException(e.getMessage());
-		}
-		
-		Parser parser = new Parser();
-		parser.run(contents);
-		avl = parser.getAVL();
-		bst = parser.getBST();
-		scopesMap = parser.getScopesMap();
-		nodesCount = avl.searchList("a");
-		avl.inOrder();
-		for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
-            Node node = entry.getKey();
-            Integer comparisons = entry.getValue();
-            System.out.println("Node: " + node + ", Comparisons: " + comparisons);
-        }
-		/*
 		while(true) {
 			System.out.println("\nMapeamento Arquivos Arvores Bst-Avl\r\n"
 					+ "1. Carregar dados de um arquivo ED2\r\n"
@@ -91,18 +66,130 @@ public class Main {
 			
 			switch (option) {
 				case "1":
+					System.out.println("Informe o nome do arquivo a ser carregado: ");
+					String archiveName = input.nextLine();
+					Archive archive = new Archive(archiveName);
+					List<String> contents;
+					try {
+						contents = archive.readArchive();
+					} catch (IOException e) {
+						input.close();
+						throw new RuntimeException(e.getMessage());
+					}
+					
+					parser = new Parser();
+					//Carregando dados do parser
+					parser.run(contents);
+					avl = parser.getAVL();
+					bst = parser.getBST();
+					scopesMap = parser.getScopesMap();
+					
+					System.out.println("Arquivo carregado em memória com sucesso!");
 					carregado = true;
 					break;
 				case "2":
 					if(carregado) {
+						System.out.println("Digite o identificador (String) a ser buscado no arquivo:");
+						String search = input.nextLine();
+						nodesCount = avl.searchList(search);
 						
+						if(nodesCount.size()>0) {
+							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
+								Node node = entry.getKey();
+				            	Integer comparisons = entry.getValue();
+				            	System.out.println("Node: " + node + " | Comparisons: " + comparisons +" | Parent Scope: " + scopesMap.get(node.getScopeId()));
+							}
+						}else {
+							System.out.println("Chave/escopo não existe no arquivo!");
+						}
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
 					break;
 				case "3":
 					if(carregado) {
-						
+						System.out.println("Digite 1 para adicionar um escopo e 2 para adiionar uma chave:");
+						int choice = input.nextInt();
+						if(choice==1) {
+							System.out.println("Escopos disponíveis para inserção do escopo:");
+							
+							Map<Node,Integer> scopes = new HashMap<Node,Integer>();
+							
+							for (Map.Entry<Integer, String> entry : scopesMap.entrySet()) {
+								if(entry.getValue()!="global") {
+									scopes.putAll(avl.searchList(entry.getValue()));
+								}
+							}
+							System.out.println("global 0 | Parent Scope: null");
+							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
+								if(entry.getKey().getType()=="scope") {
+									System.out.println(entry.getKey()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+								}
+							}
+							System.out.println("Digite o nome do escopo a ser inserido:");
+							String newScopeName = input.nextLine();
+							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
+							int scopeId = inputInt.nextInt();
+							//mudar pra global
+							Stack<Integer> newPath;
+							if(scopeId!=0) {
+								Node parent = avl.search(scopesMap.get(scopeId), scopeId, "scope");
+								newPath = parent.getPath();
+							}else {
+								newPath = new Stack<Integer>();
+								newPath.add(0);
+							}
+							if(avl.search(newScopeName, scopeId, "scope")==null) {
+								parser.countScopeId++;
+								scopesMap.put(parser.countScopeId, newScopeName);
+								newPath.add(parser.countScopeId);
+								avl.insert(newScopeName, scopeId, "scope", "", newPath);
+								bst.insert(newScopeName, scopeId, "scope", "", newPath);
+							}else {
+								System.out.println("Chave já existente!");
+							}
+						}else if(choice==2) {
+							System.out.println("Escopos disponíveis para inserção da chave:");
+							
+							Map<Node,Integer> scopes =  new HashMap<Node,Integer>();
+							
+							for (Map.Entry<Integer, String> entry : scopesMap.entrySet()) {
+								if(entry.getValue()!="global") {
+									scopes.putAll(avl.searchList(entry.getValue()));
+								}
+							}
+							
+							System.out.println("global 0 | Parent Scope: null");
+							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
+								if(entry.getKey().getType()=="scope") {
+									System.out.println(entry.getKey()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+								}
+							}
+							
+							System.out.println("Digite o nome da chave a ser inserida:");
+							String newScopeName = input.nextLine();
+							System.out.println("Digite o valor da chave a ser inserida:");
+							String value = input.nextLine();
+
+							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
+							int scopeId = inputInt.nextInt();
+							Stack<Integer> newPath;
+							if(scopeId!=0) {
+								Node parent = avl.search(scopesMap.get(scopeId), scopeId, "scope");
+								newPath = parent.getPath();
+							}else {
+								newPath = new Stack<Integer>();
+								newPath.add(0);
+							}
+							if(avl.search(newScopeName, scopeId, "scope")==null) {
+								avl.insert(newScopeName, scopeId, "key", value, newPath);
+								bst.insert(newScopeName, scopeId, "key", value, newPath);
+							}else {
+								System.out.println("Chave já existente!");
+							}
+						}else {
+							System.out.println("Opção inválida!");
+						}
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
@@ -158,7 +245,6 @@ public class Main {
 			}
 				
 		}
-		*/
 
 	}
 

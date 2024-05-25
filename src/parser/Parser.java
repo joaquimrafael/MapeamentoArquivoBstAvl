@@ -45,9 +45,10 @@
 package parser;
 
 import trees.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.Map;
+import java.util.HashMap;
 
 /*
 ================================================================================
@@ -77,9 +78,9 @@ public class Parser {
 	private Token currToken;
 	private int index;
 	private Stack<String> stackParser = new Stack<String>();
-	private List<Scope> scopes = new ArrayList<Scope>();
+	private Map<Integer,String> scopes = new HashMap<Integer,String>();
 	private Stack<Integer> path = new Stack<Integer>();
-	private int countScopeId = 0;
+	public int countScopeId = 0;
 	private AvlTree avl = new AvlTree();
 	private BST bst = new BST();
 	private String identifier;
@@ -109,7 +110,7 @@ public class Parser {
 	private void parse() {
 		advance();
 		//Setando escopo global
-		scopes.add(new Scope("global", 0));
+		scopes.put(0,"global");
 		path.add(0);
 		data();		
 		if (currToken.getType() != TokenType.EOF) {
@@ -178,7 +179,7 @@ public class Parser {
 			//Inserindo nó do scope encontrado
 			countScopeId++;
 			path.add(countScopeId);
-			scopes.add(new Scope(identifier, countScopeId));
+			scopes.put(countScopeId, identifier);
 			avl.insert(identifier, path.peek(), "scope", "", path);
 			bst.insert(identifier, path.peek(), "scope", "", path);
 			scope();
@@ -303,5 +304,6 @@ public class Parser {
 	
 	public AvlTree getAVL() { return(avl); }
 	
-	public List<Scope> getScopesMap() { return(scopes); }
+	public Map<Integer,String> getScopesMap() { return(scopes); }
+	
 }

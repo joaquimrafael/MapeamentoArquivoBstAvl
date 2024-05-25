@@ -57,7 +57,7 @@ public class Archive {
 	
 	private void validate(){
 		if(!this.archiveName.contains(".ed2") && !this.archiveName.contains(".ED2")) {
-			throw new RuntimeException("Formato inválido!");
+			throw new RuntimeException("Formato inválido! O arquivo precisa conter a extensão .ed2 ou .ED2");
 		}
 	}
 	
