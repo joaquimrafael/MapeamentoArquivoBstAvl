@@ -96,10 +96,6 @@ public class Parser {
 		tokens = tokenizer.tokenize(contents);
 		currToken = null;
 		index = -1;
-		
-		for(int i=0;i<tokens.size();i++) {
-			//System.out.println(tokens.get(i).getValue());
-		}
 		parse();
 	}
 	
@@ -124,10 +120,13 @@ public class Parser {
 	
 	// <data> ::= ((<scope> | <key> | <comment>)* <blank_line>)*
 	private void data() {
+		//Consumindo espaços em branco antes
+		while(currToken.getType()==TokenType.WHITESPACE) {
+			consume(TokenType.WHITESPACE);
+		}
 		TokenType type = currToken.getType();
-
 		// Consome 0+ regras do tipo <commnet> e/ou <key> e/ou <scope> seguida por <blank_line>.
-		while (type == TokenType.STRING || type == TokenType.COMMENT || type == TokenType.NEWLINE) {
+		while (type == TokenType.STRING || type == TokenType.COMMENT || type == TokenType.NEWLINE || type == TokenType.WHITESPACE) {
 			if (type == TokenType.STRING) {
 				verfifyScopeKey();
 			} else if (type == TokenType.COMMENT) {
@@ -135,7 +134,12 @@ public class Parser {
 			}
 			
 			// Após processar <comment> ou <scope> ou <key>, consome um <blank_line>.
-			consume(TokenType.NEWLINE);
+			while(currToken.getType()==TokenType.WHITESPACE || currToken.getType()==TokenType.NEWLINE) {
+				consume(currToken.getType());
+			}
+			
+			//consume(TokenType.NEWLINE);
+			
 			
 			// Neste exemplo, processamos a regra <blank_line> com uma quebra de linha na saída em tela.
 			System.out.println();			
@@ -152,17 +156,16 @@ public class Parser {
 		consume(TokenType.STRING);
 		
 		//adionar conteúdo ao identificador
-		if(currToken.getType()==TokenType.COMMENT) {
-			tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue()+"#");
-			consume(TokenType.COMMENT);
+		
+		while(currToken.getType()!=TokenType.NEWLINE && currToken.getType()!=TokenType.EOF && currToken.getType()!=TokenType.SCOPE && currToken.getType()!=TokenType.KEY) {
+			tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue()+currToken.getValue());
+			consume(currToken.getType());
 		}
+		//Removendo espaços em branco do final do identificador
+		tokens.get(identifierIndex).setValue(tokens.get(identifierIndex).getValue().trim());
 		
 		identifier = tokens.get(identifierIndex).getValue();
-		
-		//Consumindo espaços antes do identificador
-		while (currToken.getType() == TokenType.WHITESPACE) {
-			consume(TokenType.WHITESPACE);
-		}
+
 		//Consumindo quebra de linhas para escopo
 		while(currToken.getType() == TokenType.NEWLINE) {
 			consume(TokenType.NEWLINE);
@@ -180,8 +183,8 @@ public class Parser {
 			countScopeId++;
 			path.add(countScopeId);
 			scopes.put(countScopeId, identifier);
-			avl.insert(identifier, path.peek(), "scope", "", path);
-			bst.insert(identifier, path.peek(), "scope", "", path);
+			avl.insert(identifier, path.peek(), "scope", "", copyStack(path));
+			bst.insert(identifier, path.peek(), "scope", "", copyStack(path));
 			scope();
 		}else if(currToken.getType()== TokenType.COMMENT  && !blankScope) {
 			comment();
@@ -251,6 +254,10 @@ public class Parser {
 		//Consumindo o identificador '='
 		consume(TokenType.KEY);
 		
+		//Consumindo espaços em branco depois do igual
+		while(currToken.getType()==TokenType.WHITESPACE) {
+			consume(TokenType.WHITESPACE);
+		}
 		int identifierIndex = index;
 		consume(currToken.getType());
 		//Consumindo conteúdo de value
@@ -261,8 +268,8 @@ public class Parser {
 		
 		//Inserindo key na árvore
 		String value = tokens.get(identifierIndex).getValue();
-		avl.insert(identifier, path.peek(), "key", value, path);
-		bst.insert(identifier, path.peek(), "key", value, path);
+		avl.insert(identifier, path.peek(), "key", value, copyStack(path));
+		bst.insert(identifier, path.peek(), "key", value, copyStack(path));
 	}
 	
 	// <comment> ::= "#" <string>
@@ -298,6 +305,9 @@ public class Parser {
 		}
 	}
 	
+	private Stack<Integer> copyStack(Stack<Integer> original) {
+	    return (Stack<Integer>) original.clone();
+	}
 	
 	//Getters das árvores construídas e do mapa de scopes
 	public BST getBST() { return(bst); }

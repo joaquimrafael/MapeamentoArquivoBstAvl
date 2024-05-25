@@ -201,9 +201,9 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return "node: " + data
-                + ", value: " + this.value
-                + ", scopeId: " + this.scopeId
+        return "identifier: '" + data
+                + "', value: '" + this.value
+                + "', scopeId: " + this.scopeId
                 + ", isRoot?: " + (this.isRoot())
                 + ", isLeaf?: " + (this.isLeaf())
                 + ", Degree: " + (this.getDegree())

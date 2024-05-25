@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 import trees.AvlTree;
 import trees.BST;
@@ -119,16 +120,21 @@ public class Main {
 									scopes.putAll(avl.searchList(entry.getValue()));
 								}
 							}
-							System.out.println("Nome: global | scopeId: 0 | Parent Scope: null");
+							System.out.println("identifier: 'global' | scopeId: 0 | Parent Scope: null");
 							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
 								if(entry.getKey().getType()=="scope") {
-									System.out.println("Nome: "+entry.getKey().getData()+" | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+									//Mostrar melhor caminho
+									System.out.println("identifier: '"+entry.getKey().getData()+"' | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
 								}
 							}
 							System.out.println("Digite o nome do escopo a ser inserido:");
 							String newScopeName = input.nextLine();
 							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
 							String scopeIdString = input.nextLine();
+							if(!isInteger(scopeIdString)) {
+								System.out.println("Tipo de entrada inválida!");
+								continue;
+							}
 							int scopeId = Integer.parseInt(scopeIdString);
 							if(!scopesMap.containsKey(scopeId)) {
 								System.out.println("O scopeId não existe atualmente, impossível inserir um novo escopo!");
@@ -146,12 +152,12 @@ public class Main {
 								parser.countScopeId++;
 								scopesMap.put(parser.countScopeId, newScopeName);
 								newPath.add(parser.countScopeId);
-								avl.insert(newScopeName, scopeId, "scope", "", newPath);
-								bst.insert(newScopeName, scopeId, "scope", "", newPath);
+								avl.insert(newScopeName, parser.countScopeId, "scope", "", newPath);
+								bst.insert(newScopeName, parser.countScopeId, "scope", "", newPath);
 								avl.inOrder();
 								System.out.println("Inserção realizada com sucesso!");
 							}else {
-								System.out.println("Chave já existente!");
+								System.out.println("Escopo já existente!");
 							}
 						}else if(choice.equals("2")) {
 							System.out.println("Escopos disponíveis para inserção da chave:");
@@ -164,20 +170,25 @@ public class Main {
 								}
 							}
 							
-							System.out.println("Nome: global | scopeId: 0 | Parent Scope: null");
+							System.out.println("identifier: global | scopeId: 0 | Parent Scope: null");
 							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
 								if(entry.getKey().getType()=="scope") {
-									System.out.println("Nome: "+entry.getKey().getData()+" | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+									//Mostrar melhor caminho?
+									System.out.println("identifier: '"+entry.getKey().getData()+"' | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
 								}
 							}
 							
 							System.out.println("Digite o nome da chave a ser inserida:");
-							String newScopeName = input.nextLine();
+							String newKeyName = input.nextLine();
 							System.out.println("Digite o valor da chave a ser inserida:");
 							String value = input.nextLine();
 
 							System.out.println("Digite o scopeId onde o novo escopo será inserido:");
 							String scopeIdString = input.nextLine();
+							if(!isInteger(scopeIdString)) {
+								System.out.println("Tipo de entrada inválida!");
+								continue;
+							}
 							int scopeId = Integer.parseInt(scopeIdString);
 							if(!scopesMap.containsKey(scopeId)) {
 								System.out.println("O scopeId não existe atualmente, impossível inserir um nova chave!");
@@ -191,9 +202,9 @@ public class Main {
 								newPath = new Stack<Integer>();
 								newPath.add(0);
 							}
-							if(avl.search(newScopeName, scopeId, "scope")==null) {
-								avl.insert(newScopeName, scopeId, "key", value, newPath);
-								bst.insert(newScopeName, scopeId, "key", value, newPath);
+							if(avl.search(newKeyName, scopeId, "key")==null) {
+								avl.insert(newKeyName, scopeId, "key", value, newPath);
+								bst.insert(newKeyName, scopeId, "key", value, newPath);
 								System.out.println("Inserção realizada com sucesso!");
 							}else {
 								System.out.println("Chave já existente!");
@@ -207,14 +218,88 @@ public class Main {
 					break;
 				case "4":
 					if(carregado) {
-						
+						System.out.println("Informe o nome do identificador da busca para alteração:");
+						String search = input.nextLine();
+						nodesCount = avl.searchList(search);
+						List<Node> validNodes = new ArrayList<Node>();
+						if(nodesCount.size()>0) {
+							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
+								Node node = entry.getKey();
+								if(node.getType() == "key") {
+									System.out.println(node+" | Parent Scope: " + scopesMap.get(node.getScopeId()));
+									validNodes.add(node);
+								}
+							}
+							System.out.println("Digite o identificador da chave desejada:");
+							String identifier = input.nextLine();
+							System.out.println("Digite o scopeId da chave desejada:");
+							String scopeIdString = input.nextLine();
+							if(!isInteger(scopeIdString)) {
+								System.out.println("Tipo de entrada inválida!");
+								continue;
+							}
+							int scopeId = Integer.parseInt(scopeIdString);
+							boolean foundNode = false;
+							for(int i=0;i<validNodes.size();i++) {
+								if(validNodes.get(i).getData()==identifier && validNodes.get(i).getScopeId()==scopeId) {
+									foundNode = true;
+								}
+							}
+							if(!foundNode) {
+								System.out.println("Chave especificada não existente!");
+								continue;
+							}
+							System.out.println("Digite o novo valor da chave:");
+							String value = input.nextLine();
+							avl.search(identifier, scopeId, "key").setValue(value);
+							bst.search(identifier, scopeId, "key").setValue(value);
+							System.out.println("Alteração feita com sucesso!");
+						}else {
+							System.out.println("Chave não existe no arquivo!");
+						}
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
 					break;
 				case "5":
 					if(carregado) {
-						
+						System.out.println("Informe o nome do identificador da busca para remoção:");
+						String search = input.nextLine();
+						nodesCount = avl.searchList(search);
+						List<Node> validNodes = new ArrayList<Node>();
+						if(nodesCount.size()>0) {
+							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
+								Node node = entry.getKey();
+								if(node.getType() == "key") {
+									System.out.println(node+" | Parent Scope: " + scopesMap.get(node.getScopeId()));
+									validNodes.add(node);
+								}
+							}
+							System.out.println("Digite o identificador da chave desejada:");
+							String identifier = input.nextLine();
+							System.out.println("Digite o scopeId da chave desejada:");
+							String scopeIdString = input.nextLine();
+							if(!isInteger(scopeIdString)) {
+								System.out.println("Tipo de entrada inválida!");
+								continue;
+							}
+							int scopeId = Integer.parseInt(scopeIdString);
+							boolean foundNode = false;
+							for(int i=0;i<validNodes.size();i++) {
+								if(validNodes.get(i).getData()==identifier && validNodes.get(i).getScopeId()==scopeId) {
+									foundNode = true;
+								}
+							}
+							if(!foundNode) {
+								System.out.println("Chave especificada não existente!");
+								continue;
+							}
+							avl.remove(identifier, scopeId, "key");
+							bst.remove(identifier, scopeId, "key");
+							System.out.println("Remoção feita com sucesso!");
+						}else {
+							System.out.println("Chave não existe no arquivo!");
+						}
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
@@ -228,20 +313,14 @@ public class Main {
 					break;
 				case "7":
 					if(carregado) {
-						bst.treeInformation();
-						bst.preOrder();
 						bst.inOrder();
-						bst.postOrder();
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
 					break;
 				case "8":
 					if(carregado) {
-						avl.treeInformation();
-						avl.preOrder();
 						avl.inOrder();
-						avl.postOrder();
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}
@@ -258,5 +337,17 @@ public class Main {
 		}
 
 	}
+	
+    public static boolean isInteger(String s) {
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
+        try {
+            Integer.parseInt(s.trim());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 
 }

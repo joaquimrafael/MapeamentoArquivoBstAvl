@@ -135,7 +135,7 @@ public class Tokenizer {
 					while (Character.isWhitespace(currChar)) {
 						currChar = getNextChar();
 					}
-					tokens.add(new Token(TokenType.WHITESPACE, " "));
+					tokens.add(new Token(TokenType.WHITESPACE," "));
 
 					// Se passamos por uma sequência de espaços em branco, voltamos uma posição do cursor
 					// somente se o último caractere não for um espaço em branco, para que a instrução
@@ -187,7 +187,7 @@ public class Tokenizer {
 				tokens.add(new Token(TokenType.STRING, sb.toString()));
 				//Adicionando novamente o WHITESPACE
 				if(Character.isWhitespace(currChar)) {
-					tokens.add(new Token(TokenType.WHITESPACE, " "));
+					//tokens.add(new Token(TokenType.WHITESPACE, " "));
 				}
 				sb.setLength(0);
 				isString = false;

@@ -31,8 +31,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.io.File;
+
+import trees.*;
 
 
 public class Archive {
@@ -72,12 +75,12 @@ public class Archive {
 		return(this.archive);
 	}
 	
-	public void saveArchive(List<String> archive) throws IOException {
+	public void saveArchive(AvlTree tree, Map<Integer,String> scopesMap) throws IOException {
 		Scanner input = new Scanner(System.in);
 		String name;
-		System.out.println("Digite o nome do arquivo .ED2:");
+		System.out.println("Digite o nome do arquivo .ed2:");
 		name = input.nextLine();
-		name = name + ".ED2";
+		name = name + ".ed2.txt";
 		File file = new File(name);
 		
 		if(name.contains(" ")) {
@@ -90,16 +93,64 @@ public class Archive {
 			throw new IOException("Arquivo já existente no diretório");
 		}
 		
-		if(this.opened==true) {
-			BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name+".ED2"));
-			for(int i=0;i<archive.size();i++) {
-				buffWrite.append(archive.get(i) + "\n");
-			}
-			buffWrite.close();
-		}else {
-			input.close();
-			throw new IOException("Nenhum arquivo aberto até o momento!");
+		
+		AvlTree treeCopy = tree;
+		//writeScope
+		
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name+".ed2"));
+		for(int i=0;i<archive.size();i++) {
+			buffWrite.append(archive.get(i) + "\n");
 		}
+		buffWrite.close();
 		input.close();
+	}
+	
+	private void writeScope(AvlTree tree, Map<Integer,String> scopesMap, int currentScopeId, List<String> archive) {
+		archive.add(scopesMap.get(currentScopeId)+"(\n");
+		Node result = searchKeys(tree.getRoot(),currentScopeId,tree);
+		while(result!=null) {
+			result = searchKeys(tree.getRoot(),currentScopeId,tree);
+			archive.add(result.getData()+"="+result.getValue()+"\n");
+		}
+		
+		/*result = search(tree.getRoot(),currentScopeId,tree,"scope");
+		while(result!=null) {
+			result = searchKeys(tree.getRoot(),currentScopeId,tree,"scope");
+			writeScope(tree, scopesMap, currentScopeId, archive);
+		}
+		archive.add(")\n");*/
+	}
+	
+	private Node searchKeys(Node root, int scopeId, AvlTree tree) {
+	    if (root == null) {
+	        return null;
+	    }
+	    if (root.getScopeId() == scopeId && root.getType()=="key") {
+	        Node aux = root;
+	        tree.remove(root.getData(), root.getScopeId(), "key");
+	        return aux;
+	    }
+	    Node result = searchKeys(root.getRight(), scopeId, tree);
+	    if (result != null) {
+	        return result;
+	    }
+	    return searchKeys(root.getLeft(), scopeId, tree);
+	}
+	
+	private Node searchNodes(Node root, int scopeId, AvlTree tree) {
+		//percorro todos os nos, se for escopo vou no path, dou um pop e verifico se é scopeId se for eu removo da árvore e retorno o nó
+	    if (root == null) {
+	        return null;
+	    }
+	    if (root.getScopeId() == scopeId && root.getType()=="scope") {
+	        Node aux = root;
+	        tree.remove(root.getData(), root.getScopeId(), "scope");
+	        return aux;
+	    }
+	    Node result = searchKeys(root.getRight(), scopeId, tree);
+	    if (result != null) {
+	        return result;
+	    }
+	    return searchKeys(root.getLeft(), scopeId, tree);
 	}
 }
