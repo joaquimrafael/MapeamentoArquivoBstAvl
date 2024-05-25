@@ -49,6 +49,7 @@ public class Main {
 		Map<Integer,String> scopesMap = null;
 		Map<Node,Integer> nodesCount = null;
 		Parser parser = null;
+		Archive archive = null;
 		
 		while(true) {
 			System.out.println("\nMapeamento Arquivos Arvores Bst-Avl\r\n"
@@ -68,7 +69,7 @@ public class Main {
 				case "1":
 					System.out.println("Informe o nome do arquivo a ser carregado: ");
 					String archiveName = input.nextLine();
-					Archive archive = new Archive(archiveName);
+					archive = new Archive(archiveName);
 					List<String> contents;
 					try {
 						contents = archive.readArchive();
@@ -306,7 +307,11 @@ public class Main {
 					break;
 				case "6":
 					if(carregado) {
-						
+						try {
+							archive.saveArchive(avl, scopesMap);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
 					}else {
 						System.out.println("Carregue dados primeiro!");
 					}

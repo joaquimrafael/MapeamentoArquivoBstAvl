@@ -305,6 +305,7 @@ public class Parser {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Stack<Integer> copyStack(Stack<Integer> original) {
 	    return (Stack<Integer>) original.clone();
 	}

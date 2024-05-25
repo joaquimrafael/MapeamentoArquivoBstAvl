@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Stack;
 import java.io.File;
 
 import trees.*;
@@ -76,49 +77,53 @@ public class Archive {
 	}
 	
 	public void saveArchive(AvlTree tree, Map<Integer,String> scopesMap) throws IOException {
-		Scanner input = new Scanner(System.in);
 		String name;
 		System.out.println("Digite o nome do arquivo .ed2:");
-		name = input.nextLine();
+		name = "out";
 		name = name + ".ed2.txt";
 		File file = new File(name);
-		
+		//Se arquivo existir escrever nele
 		if(name.contains(" ")) {
-			input.close();
 			throw new IOException("Arquivo não pode conter espaços no nome!");
 		}
 		
 		if(file.exists()) {
-			input.close();
-			throw new IOException("Arquivo já existente no diretório");
+			//throw new IOException("Arquivo já existente no diretório");
 		}
 		
 		
 		AvlTree treeCopy = tree;
-		//writeScope
+		List<String> archive = new ArrayList<String>();
 		
-		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name+".ed2"));
+		writeScope(treeCopy,scopesMap,0,archive);
+		
+		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name));
 		for(int i=0;i<archive.size();i++) {
+			System.out.println(archive.get(i));
 			buffWrite.append(archive.get(i) + "\n");
 		}
 		buffWrite.close();
-		input.close();
 	}
 	
 	private void writeScope(AvlTree tree, Map<Integer,String> scopesMap, int currentScopeId, List<String> archive) {
-		archive.add(scopesMap.get(currentScopeId)+"(\n");
+		if(currentScopeId != 0) {
+			archive.add(scopesMap.get(currentScopeId)+"(");
+		}
+		System.out.println(currentScopeId);
 		Node result = searchKeys(tree.getRoot(),currentScopeId,tree);
 		while(result!=null) {
+			archive.add(result.getData()+"="+result.getValue());
 			result = searchKeys(tree.getRoot(),currentScopeId,tree);
-			archive.add(result.getData()+"="+result.getValue()+"\n");
 		}
 		
-		/*result = search(tree.getRoot(),currentScopeId,tree,"scope");
+		result = searchScopes(tree.getRoot(),currentScopeId,tree);
 		while(result!=null) {
-			result = searchKeys(tree.getRoot(),currentScopeId,tree,"scope");
-			writeScope(tree, scopesMap, currentScopeId, archive);
+			writeScope(tree, scopesMap, result.getPath().peek(), archive);
+			result = searchScopes(tree.getRoot(),currentScopeId,tree);
 		}
-		archive.add(")\n");*/
+		if(currentScopeId != 0) {
+			archive.add(")");
+		}
 	}
 	
 	private Node searchKeys(Node root, int scopeId, AvlTree tree) {
@@ -126,7 +131,7 @@ public class Archive {
 	        return null;
 	    }
 	    if (root.getScopeId() == scopeId && root.getType()=="key") {
-	        Node aux = root;
+	        Node aux = new Node(root.getData(), root.getScopeId(), root.getType(), root.getValue(), root.getPath());
 	        tree.remove(root.getData(), root.getScopeId(), "key");
 	        return aux;
 	    }
@@ -137,20 +142,29 @@ public class Archive {
 	    return searchKeys(root.getLeft(), scopeId, tree);
 	}
 	
-	private Node searchNodes(Node root, int scopeId, AvlTree tree) {
-		//percorro todos os nos, se for escopo vou no path, dou um pop e verifico se é scopeId se for eu removo da árvore e retorno o nó
+	private Node searchScopes(Node root, int scopeId, AvlTree tree) {
 	    if (root == null) {
 	        return null;
 	    }
-	    if (root.getScopeId() == scopeId && root.getType()=="scope") {
-	        Node aux = root;
-	        tree.remove(root.getData(), root.getScopeId(), "scope");
-	        return aux;
+	    if(root.getType()=="scope") {
+	    	Stack<Integer> pathCopy = copyStack(root.path);
+	    	int currentScopeId = pathCopy.pop();
+	    	if (pathCopy.peek() == scopeId) {
+	    		Stack<Integer> newPath = copyStack(root.getPath());
+	    		Node aux = new Node(root.getData(), root.getScopeId(), root.getType(), root.getValue(), newPath);
+		        tree.remove(root.getData(), currentScopeId, "scope");
+		        return aux;
+		    }
 	    }
 	    Node result = searchKeys(root.getRight(), scopeId, tree);
 	    if (result != null) {
 	        return result;
 	    }
 	    return searchKeys(root.getLeft(), scopeId, tree);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Stack<Integer> copyStack(Stack<Integer> original) {
+	    return (Stack<Integer>) original.clone();
 	}
 }
