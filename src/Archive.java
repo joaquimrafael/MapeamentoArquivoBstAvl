@@ -8,6 +8,7 @@
  * Estruturas de Dados II Professor Andre Kishimoto Sala 04G12
  * 
  * Consulta em: 
+ * https://www.mballem.com/post/manipulando-arquivo-txt-com-java/
  * https://youtu.be/Gt2yBZAhsGM?si=WNOSZxaiCWmrA-sO
  * https://www.geeksforgeeks.org/binary-tree-data-structure/
  * https://www.ime.usp.br/~pf/mac0122-2003/aulas/bin-trees.html
@@ -45,7 +46,7 @@ public class Archive {
 	private Boolean opened;
 	
 	public Archive(String archiveName) {
-		this.archiveName = archiveName + ".txt";
+		this.archiveName = archiveName + ".ed2.txt";
 		this.opened = false;
 		this.archive = new ArrayList<String>();
 		try {
@@ -61,11 +62,17 @@ public class Archive {
 	
 	private void validate(){
 		if(!this.archiveName.contains(".ed2") && !this.archiveName.contains(".ED2")) {
-			throw new RuntimeException("Formato inválido! O arquivo precisa conter a extensão .ed2 ou .ED2");
+			throw new RuntimeException("! Formato inválido! O arquivo precisa conter a extensão .ed2 ou .ED2");
 		}
 	}
 	
 	public List<String> readArchive() throws IOException{
+        File file = new File(this.archiveName);
+
+        if (!file.exists()) {
+            throw new IOException("! Arquivo .ed2 não encontrado!");
+        }
+        
 		BufferedReader buffRead = new BufferedReader(new FileReader(this.archiveName));
 		String line = "";
 	    while ((line = buffRead.readLine()) != null) {
@@ -76,92 +83,93 @@ public class Archive {
 		return(this.archive);
 	}
 	
-	public void saveArchive(AvlTree tree, Map<Integer,String> scopesMap) throws IOException {
-		String name;
-		System.out.println("Digite o nome do arquivo .ed2:");
-		name = "out";
-		name = name + ".ed2.txt";
+	public void saveArchive(BST tree, Map<Integer,String> scopesMap, String archiveName) throws IOException {
+		String name = archiveName+".ed2.txt";
 		File file = new File(name);
-		//Se arquivo existir escrever nele
 		if(name.contains(" ")) {
-			throw new IOException("Arquivo não pode conter espaços no nome!");
+			throw new IOException("! Arquivo não pode conter espaços no nome!");
 		}
 		
 		if(file.exists()) {
-			//throw new IOException("Arquivo já existente no diretório");
+			System.out.println(">Você deseja sobreescrever o arquivo já existente no diretório? Digite 1 para Sim e 0 para Não");
+			@SuppressWarnings("resource")
+			Scanner entry = new Scanner(System.in);
+			int chose = entry.nextInt();
+			if(chose !=1) {
+				System.out.println("! Operação cancelada!");
+				entry.close();
+				return;
+			}
 		}
 		
 		
-		AvlTree treeCopy = tree;
+		BST treeCopy = tree;
 		List<String> archive = new ArrayList<String>();
 		
 		writeScope(treeCopy,scopesMap,0,archive);
 		
 		BufferedWriter buffWrite = new BufferedWriter(new FileWriter(name));
 		for(int i=0;i<archive.size();i++) {
-			System.out.println(archive.get(i));
 			buffWrite.append(archive.get(i) + "\n");
 		}
 		buffWrite.close();
 	}
 	
-	private void writeScope(AvlTree tree, Map<Integer,String> scopesMap, int currentScopeId, List<String> archive) {
-		if(currentScopeId != 0) {
-			archive.add(scopesMap.get(currentScopeId)+"(");
-		}
-		System.out.println(currentScopeId);
-		Node result = searchKeys(tree.getRoot(),currentScopeId,tree);
-		while(result!=null) {
-			archive.add(result.getData()+"="+result.getValue());
-			result = searchKeys(tree.getRoot(),currentScopeId,tree);
-		}
-		
-		result = searchScopes(tree.getRoot(),currentScopeId,tree);
-		while(result!=null) {
-			writeScope(tree, scopesMap, result.getPath().peek(), archive);
-			result = searchScopes(tree.getRoot(),currentScopeId,tree);
-		}
-		if(currentScopeId != 0) {
-			archive.add(")");
-		}
-	}
-	
-	private Node searchKeys(Node root, int scopeId, AvlTree tree) {
-	    if (root == null) {
-	        return null;
-	    }
-	    if (root.getScopeId() == scopeId && root.getType()=="key") {
-	        Node aux = new Node(root.getData(), root.getScopeId(), root.getType(), root.getValue(), root.getPath());
-	        tree.remove(root.getData(), root.getScopeId(), "key");
-	        return aux;
-	    }
-	    Node result = searchKeys(root.getRight(), scopeId, tree);
-	    if (result != null) {
-	        return result;
-	    }
-	    return searchKeys(root.getLeft(), scopeId, tree);
-	}
-	
-	private Node searchScopes(Node root, int scopeId, AvlTree tree) {
-	    if (root == null) {
-	        return null;
-	    }
-	    if(root.getType()=="scope") {
-	    	Stack<Integer> pathCopy = copyStack(root.path);
-	    	int currentScopeId = pathCopy.pop();
-	    	if (pathCopy.peek() == scopeId) {
-	    		Stack<Integer> newPath = copyStack(root.getPath());
-	    		Node aux = new Node(root.getData(), root.getScopeId(), root.getType(), root.getValue(), newPath);
-		        tree.remove(root.getData(), currentScopeId, "scope");
-		        return aux;
-		    }
-	    }
-	    Node result = searchKeys(root.getRight(), scopeId, tree);
-	    if (result != null) {
-	        return result;
-	    }
-	    return searchKeys(root.getLeft(), scopeId, tree);
-	}
+	private void writeScope(BST tree, Map<Integer, String> scopesMap, int currentScopeId, List<String> archive) {
+        if (currentScopeId != 0) {
+            archive.add(scopesMap.get(currentScopeId) + "(");
+        }
+
+        Node result;
+        while ((result = searchKeys(tree.getRoot(), currentScopeId, tree)) != null) {
+            archive.add(result.getData() + "=" + result.getValue());
+        }
+
+        while ((result = searchScopes(tree.getRoot(), currentScopeId, tree)) != null) {
+            writeScope(tree, scopesMap, result.getScopeId(), archive);
+        }
+
+        if (currentScopeId != 0) {
+            archive.add(")");
+        }
+    }
+
+    private Node searchKeys(Node root, int scopeId, BST tree) {
+        if (root == null) {
+            return null;
+        }
+        if (root.getScopeId() == scopeId && root.getType().equals("key")) {
+            Node aux = new Node(root.getData(), root.getScopeId(), root.getParent(), root.getType(), root.getValue(), root.getPath());
+            tree.remove(root.getData(), root.getScopeId(), "key");
+            return aux;
+        }
+        Node result = searchKeys(root.getRight(), scopeId, tree);
+        if (result != null) {
+            return result;
+        }
+        return searchKeys(root.getLeft(), scopeId, tree);
+    }
+
+    private Node searchScopes(Node root, int scopeId, BST tree) {
+        if (root == null) {
+            return null;
+        }
+        if (root.getType().equals("scope")) {
+            Stack<Integer> pathCopy = copyStack(root.path);
+            int currentScopeId = pathCopy.pop();
+            if (pathCopy.peek() == scopeId) {
+                Stack<Integer> newPath = copyStack(root.getPath());
+                Node aux = new Node(root.getData(), root.getScopeId(), root.getParent(), root.getType(), root.getValue(), newPath);
+                tree.remove(root.getData(), currentScopeId, "scope");
+                return aux;
+            }
+        }
+        Node result = searchScopes(root.getRight(), scopeId, tree);
+        if (result != null) {
+            return result;
+        }
+        return searchScopes(root.getLeft(), scopeId, tree);
+    }
 	
 	@SuppressWarnings("unchecked")
 	private Stack<Integer> copyStack(Stack<Integer> original) {

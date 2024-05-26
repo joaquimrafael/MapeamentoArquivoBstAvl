@@ -1,20 +1,3 @@
-//
-// Exemplo de tokenizer (lexer) e parser.
-// Copyright (C) 2024 André Kishimoto
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-//
 /*	Apl2
  * 
  * Por: Joaquim Rafael Mariano Prieto Pereira  RA: 10408805 
@@ -25,6 +8,7 @@
  * Estruturas de Dados II Professor Andre Kishimoto Sala 04G12
  * 
  * Consulta em: 
+ * https://www.mballem.com/post/manipulando-arquivo-txt-com-java/
  * https://youtu.be/Gt2yBZAhsGM?si=WNOSZxaiCWmrA-sO
  * https://www.geeksforgeeks.org/binary-tree-data-structure/
  * https://www.ime.usp.br/~pf/mac0122-2003/aulas/bin-trees.html

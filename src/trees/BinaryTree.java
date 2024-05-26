@@ -8,6 +8,7 @@
  * Estruturas de Dados II Professor Andre Kishimoto Sala 04G12
  * 
  * Consulta em: 
+ * https://www.mballem.com/post/manipulando-arquivo-txt-com-java/
  * https://youtu.be/Gt2yBZAhsGM?si=WNOSZxaiCWmrA-sO
  * https://www.geeksforgeeks.org/binary-tree-data-structure/
  * https://www.ime.usp.br/~pf/mac0122-2003/aulas/bin-trees.html

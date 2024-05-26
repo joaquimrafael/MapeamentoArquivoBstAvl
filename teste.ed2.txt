@@ -1,5 +1,24 @@
-a(
-b(
-a=3
+# Arquivo de teste apl2 estrutura de dados 2
+
+x (
+  y (
+    x (
+      y (
+        xyz = valor 1
+      )
+    )
+  )
 )
+
+qota = valor exemplo
+oi querido = valorx
+
+z (
+  p (
+    z (
+      p (
+        xyz = valor 2
+      )
+    )
+  )
 )
