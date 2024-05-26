@@ -130,6 +130,9 @@ public class Node implements Comparable<Node> {
 
     public Node getLeft() { return left; }
     
+    public void setType(String type) { this.type = type; }
+    
+    public void setPath(Stack<Integer> path) { this.path = path; }
     
 
     public void setLeft(Node left) { 

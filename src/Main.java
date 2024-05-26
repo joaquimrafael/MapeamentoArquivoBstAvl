@@ -168,7 +168,6 @@ public class Main {
 								newPath.add(parser.countScopeId);
 								avl.insert(newScopeName, parser.countScopeId, "scope", "", newPath);
 								bst.insert(newScopeName, parser.countScopeId, "scope", "", newPath);
-								avl.inOrder();
 								System.out.println("! Inserção realizada com sucesso!");
 							}else {
 								System.out.println("! Escopo já existente!");

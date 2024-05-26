@@ -103,51 +103,55 @@ public class BST extends BinaryTree {
 
     public void remove(String data, int scopeId, String type) {
         if (search(data, scopeId, type) == null) {
-            throw new RuntimeException("Não existe um nó com essa chave" + data + scopeId + type);
+            throw new RuntimeException("Não existe um nó com essa chave: " + data + " " + scopeId + " " + type);
         } else {
-            this.root = remove(root.getParent(), root, data, scopeId, type);
+            this.root = remove(root, data, scopeId, type);
         }
     }
 
-    private Node remove(Node parent, Node current, String data, int scopeId, String type) {
+    private Node remove(Node current, String data, int scopeId, String type) {
         if (current == null) {
             return null;
+        }
+
+        Node removeNode = new Node(data, scopeId, type);
+        int result = current.compareTo(removeNode);
+
+        if (result > 0) {
+            current.setLeft(remove(current.getLeft(), data, scopeId, type));
+        } else if (result < 0) {
+            current.setRight(remove(current.getRight(), data, scopeId, type));
         } else {
-            Node removeNode = new Node(data, scopeId, type);
-            int result = current.compareTo(removeNode);
-            if (result > 0) {
-                current.setLeft(remove(current, current.getLeft(), data, scopeId, type));
-            } else if (result < 0) {
-                current.setRight(remove(current, current.getRight(), data, scopeId, type));
+            // Nó encontrado
+            if (current.isLeaf()) {
+                return null; // Remover o nó folha
+            } else if (current.getLeft() == null) {
+                Node temp = current.getRight();
+                current.setParent(null);
+                return temp;
+            } else if (current.getRight() == null) {
+                Node temp = current.getLeft();
+                current.setParent(null);
+                return temp;
             } else {
-                if (current.isLeaf()) {
-                    current.setParent(null);
-                    current = null;
-                } else if (current.getLeft() == null) {
-                    Node removed = current;
-                    current = removed.getRight();
-                    current.setParent(removed.getParent());
-                    removed.setData(null);
-                    removed.setParent(null);
-                    removed.setLeft(null);
-                    removed.setRight(null);
-                } else if (current.getRight() == null) {
-                    Node removed = current;
-                    current = current.getLeft();
-                    current.setParent(removed.getParent());
-                    removed.setData(null);
-                    removed.setParent(null);
-                    removed.setLeft(null);
-                    removed.setRight(null);
-                } else {
-                    Node predecessor = findPredecessor(data, scopeId, type);
-                    current.setData(predecessor.getData());
-                    current.setScopeId(predecessor.getScopeId());
-                    current.setLeft(remove(current, current.getLeft(), predecessor.getData(), predecessor.getScopeId(), type));
-                }
+                // Nó com dois filhos
+                Node successor = findMin(current.getRight());
+                current.setData(successor.getData());
+                current.setScopeId(successor.getScopeId());
+                current.setType(successor.getType());
+                current.setPath(successor.getPath());
+                current.setValue(successor.getValue());
+                current.setRight(remove(current.getRight(), successor.getData(), successor.getScopeId(), successor.getType()));
             }
         }
         return current;
+    }
+
+    private Node findMin(Node node) {
+        while (node.getLeft() != null) {
+            node = node.getLeft();
+        }
+        return node;
     }
 
     public Node findPredecessor(String data, int scopeId, String type) {
@@ -206,13 +210,6 @@ public class BST extends BinaryTree {
         } else {
             return findMin(root);
         }
-    }
-
-    private Node findMin(Node root) {
-        while (root.getLeft() != null) {
-            root = root.getLeft();
-        }
-        return root;
     }
 
     public Node findMax() {

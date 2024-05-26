@@ -80,7 +80,7 @@ public class BinaryTree {
 	}
 	
 	public void inOrder() {
-		System.out.println("InOrder traversal:");
+		System.out.println("InOrder transversal:");
 		inOrder(root); 
 		}
 	
@@ -93,7 +93,7 @@ public class BinaryTree {
 	}
 	
 	public void preOrder() {
-		System.out.println("PreOrder traversal:");
+		System.out.println("PreOrder transversal:");
 		preOrder(root);
 		}
 	
@@ -107,7 +107,7 @@ public class BinaryTree {
 	}
 	
 	public void postOrder() {
-		System.out.println("PostOrder traversal:");
+		System.out.println("PostOrder transversal:");
 		postOrder(root); 
 		}
 	

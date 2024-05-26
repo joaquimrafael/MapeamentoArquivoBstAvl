@@ -1,24 +1,23 @@
 # Arquivo de teste apl2 estrutura de dados 2
 
+xyz = valor
+
 x (
-  y (
-    x (
-      y (
-        xyz = valor 1
-      )
-    )
-  )
+y(
+x = y
+g(
+a = 4
+)
+)
 )
 
-qota = valor exemplo
-oi querido = valorx
+fr# = valor5
 
-z (
-  p (
-    z (
-      p (
-        xyz = valor 2
-      )
-    )
-  )
+h (
+hello = world
+)
+
+
+
+l (
 )

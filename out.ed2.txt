@@ -2,11 +2,9 @@ xyz=valor
 fr#=valor5
 x(
 y(
-x=valor
+x=y
 g(
 a=4
-)
-g(
 )
 )
 )

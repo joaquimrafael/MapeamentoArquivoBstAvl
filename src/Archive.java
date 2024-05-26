@@ -119,7 +119,6 @@ public class Archive {
         if (currentScopeId != 0) {
             archive.add(scopesMap.get(currentScopeId) + "(");
         }
-
         Node result;
         while ((result = searchKeys(tree.getRoot(), currentScopeId, tree)) != null) {
             archive.add(result.getData() + "=" + result.getValue());
