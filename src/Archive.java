@@ -46,11 +46,11 @@ public class Archive {
 	private Boolean opened;
 	
 	public Archive(String archiveName) {
-		this.archiveName = archiveName + ".ed2.txt";
+		this.archiveName = archiveName;
 		this.opened = false;
 		this.archive = new ArrayList<String>();
 		try {
-			this.validate();
+			this.archiveName = this.validate(this.archiveName);
 		}catch(RuntimeException e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -60,9 +60,11 @@ public class Archive {
 		return(this.opened);
 	}
 	
-	private void validate(){
-		if(!this.archiveName.contains(".ed2") && !this.archiveName.contains(".ED2")) {
-			throw new RuntimeException("! Formato inválido! O arquivo precisa conter a extensão .ed2 ou .ED2");
+	private String validate(String archiveName){
+		if(!archiveName.contains(".ed2") && !archiveName.contains(".ED2")){
+			return(archiveName+".ed2.txt");
+		}else {
+			return(archiveName+".txt");
 		}
 	}
 	
@@ -84,7 +86,7 @@ public class Archive {
 	}
 	
 	public void saveArchive(BST tree, Map<Integer,String> scopesMap, String archiveName) throws IOException {
-		String name = archiveName+".ed2.txt";
+		String name = this.validate(archiveName);
 		File file = new File(name);
 		if(name.contains(" ")) {
 			throw new IOException("! Arquivo não pode conter espaços no nome!");

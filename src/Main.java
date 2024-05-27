@@ -75,8 +75,8 @@ public class Main {
 					try {
 						contents = archive.readArchive();
 					} catch (IOException e) {
-						input.close();
-						throw new RuntimeException(e.getMessage());
+						System.out.println(e.getMessage());
+						continue;
 					}
 					
 					parser = new Parser();
@@ -101,7 +101,7 @@ public class Main {
 						String search = input.nextLine();
 						nodesCount = avl.searchList(search);
 						
-						if(nodesCount.size()>0) {
+						if(nodesCount!=null && nodesCount.size()>0) {
 							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
 								Node node = entry.getKey();
 				            	Integer comparisons = entry.getValue();
@@ -239,7 +239,7 @@ public class Main {
 						String search = input.nextLine();
 						nodesCount = avl.searchList(search);
 						List<Node> validNodes = new ArrayList<Node>();
-						if(nodesCount.size()>0) {
+						if(nodesCount!=null && nodesCount.size()>0) {
 							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
 								Node node = entry.getKey();
 								if(node.getType().equals("key")) {
@@ -287,7 +287,7 @@ public class Main {
 						String search = input.nextLine();
 						nodesCount = avl.searchList(search);
 						List<Node> validNodes = new ArrayList<Node>();
-						if(nodesCount.size()>0) {
+						if(nodesCount!=null && nodesCount.size()>0) {
 							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
 								Node node = entry.getKey();
 								if(node.getType().equals("key")) {
@@ -330,7 +330,7 @@ public class Main {
 						try {
 							archive.saveArchive(bst, scopesMap, archiveNameSaver);
 						} catch (IOException e) {
-							e.printStackTrace();
+							System.out.println(e.getMessage());
 						}
 						System.out.println("! Arquivo gerado/escrito com sucesso!");
 					}else {

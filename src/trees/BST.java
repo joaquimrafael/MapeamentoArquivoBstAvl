@@ -62,7 +62,7 @@ public class BST extends BinaryTree {
     	
     	searchList(this.root, data, nodesCount, 0);
     	if(nodesCount.isEmpty()) {
-    		throw new RuntimeException("Chave/escopo não existe no arquivo!");
+    		return(null);
     	}
     	
     	return nodesCount;

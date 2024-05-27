@@ -121,12 +121,6 @@ public class Parser {
 				consume(currToken.getType());
 			}
 			
-			//consume(TokenType.NEWLINE);
-			
-			
-			// Neste exemplo, processamos a regra <blank_line> com uma quebra de linha na saída em tela.
-			System.out.println();			
-			
 			type = currToken.getType();
 		}
 	}
