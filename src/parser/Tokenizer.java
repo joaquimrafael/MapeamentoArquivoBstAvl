@@ -171,7 +171,7 @@ public class Tokenizer {
 				tokens.add(new Token(TokenType.STRING, sb.toString()));
 				//Adicionando novamente o WHITESPACE
 				if(Character.isWhitespace(currChar)) {
-					tokens.add(new Token(TokenType.WHITESPACE, " "));
+					tokens.add(new Token(TokenType.WHITESPACE, ""));
 				}
 				sb.setLength(0);
 				isString = false;

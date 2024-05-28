@@ -176,4 +176,9 @@ public class Archive {
 	private Stack<Integer> copyStack(Stack<Integer> original) {
 	    return (Stack<Integer>) original.clone();
 	}
+	
+	@SuppressWarnings("unused")
+	private BST copyTree(BST tree) {
+		return (BST) tree.clone();
+	}
 }

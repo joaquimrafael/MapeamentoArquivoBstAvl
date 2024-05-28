@@ -31,7 +31,7 @@ import java.util.Stack;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BST extends BinaryTree {
+public class BST extends BinaryTree implements Cloneable {
 
     public BST() { super(); }
 
@@ -238,5 +238,25 @@ public class BST extends BinaryTree {
             return null;
         }
         return null;
+    }
+    
+    
+    @Override
+    public BST clone() {
+        BST clone = new BST();
+        clone.root = cloneRecursive(this.root);
+        return clone;
+    }
+
+    private Node cloneRecursive(Node root) {
+        if (root == null) {
+            return null;
+        }
+
+        Node newNode = new Node(root.getData(), root.getScopeId(), root.getParent(), root.getType(), root.getValue(), root.getPath());
+        newNode.setLeft(cloneRecursive(root.getLeft()));
+        newNode.setRight(cloneRecursive(root.getRight()));
+
+        return newNode;
     }
 }
