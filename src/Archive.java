@@ -173,7 +173,7 @@ public class Archive {
     }
 	
 	@SuppressWarnings("unchecked")
-	private Stack<Integer> copyStack(Stack<Integer> original) {
+	public static Stack<Integer> copyStack(Stack<Integer> original) {
 	    return (Stack<Integer>) original.clone();
 	}
 	

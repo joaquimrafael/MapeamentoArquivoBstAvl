@@ -105,7 +105,7 @@ public class Main {
 							for (Map.Entry<Node, Integer> entry : nodesCount.entrySet()) {
 								Node node = entry.getKey();
 				            	Integer comparisons = entry.getValue();
-				            	System.out.println("Node: " + node + " | Comparisons: " + comparisons +" | Parent Scope: " + scopesMap.get(node.getScopeId()));
+				            	System.out.println("Node: " + node + " | Comparisons: " + comparisons);
 							}
 						}else {
 							System.out.println("! Chave/escopo não existe no arquivo!");
@@ -138,7 +138,7 @@ public class Main {
 							System.out.println("identifier: 'global' | scopeId: 0 | Parent Scope: null");
 							for (Map.Entry<Node, Integer> entry : scopes.entrySet()) {
 								if(entry.getKey().getType().equals("scope")) {
-									System.out.println("identifier: '"+entry.getKey().getData()+"' | scopeId: "+entry.getKey().getScopeId()+" | Parent Scope: " + scopesMap.get(entry.getKey().getScopeId()));
+									System.out.println("identifier: '"+entry.getKey().getData()+"' | scopeId: "+entry.getKey().getScopeId());
 								}
 							}
 							System.out.println(">Digite o nome do escopo a ser inserido:");

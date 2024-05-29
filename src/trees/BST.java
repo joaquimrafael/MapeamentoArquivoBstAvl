@@ -248,7 +248,7 @@ public class BST extends BinaryTree implements Cloneable {
         return clone;
     }
 
-    private Node cloneRecursive(Node root) {
+    public Node cloneRecursive(Node root) {
         if (root == null) {
             return null;
         }
